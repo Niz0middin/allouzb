@@ -2,20 +2,15 @@
 
 namespace app\controllers;
 
-use app\models\Client;
-use CURLFile;
 use Yii;
 use app\models\News;
 use app\models\search\NewsSearch;
-use yii\filters\AccessControl;
-use yii\helpers\Url;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
-use yii\web\Response;
 
 /**
- * SaleController implements the CRUD actions for Sale model.
+ * NewsController implements the CRUD actions for News model.
  */
 class NewsController extends Controller
 {
@@ -25,17 +20,6 @@ class NewsController extends Controller
     public function behaviors()
     {
         return [
-            'access' => [
-                'class' => AccessControl::className(),
-                'only' => ['index', 'create', 'update', 'delete', 'view'],
-                'rules' => [
-                    [
-                        'actions' => ['index', 'create', 'update', 'delete', 'view'],
-                        'allow' => true,
-                        'roles' => ['@'],
-                    ],
-                ],
-            ],
             'verbs' => [
                 'class' => VerbFilter::className(),
                 'actions' => [
@@ -45,25 +29,8 @@ class NewsController extends Controller
         ];
     }
 
-
-    public function beforeAction($action)
-    {
-        $checks = News::find()->all();
-        foreach ($checks as $check){
-            if (time()<$check->start || time()>$check->end ){
-                $check->status = 0;
-            }else{
-                $check->status = 1;
-            }
-            $check->save();
-        }
-
-        return parent::beforeAction($action);
-    }
-
-
     /**
-     * Lists all Sale models.
+     * Lists all News models.
      * @return mixed
      */
     public function actionIndex()
@@ -78,7 +45,7 @@ class NewsController extends Controller
     }
 
     /**
-     * Displays a single Sale model.
+     * Displays a single News model.
      * @param integer $id
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
@@ -91,7 +58,7 @@ class NewsController extends Controller
     }
 
     /**
-     * Creates a new Sale model.
+     * Creates a new News model.
      * If creation is successful, the browser will be redirected to the 'view' page.
      * @return mixed
      */
@@ -99,22 +66,7 @@ class NewsController extends Controller
     {
         $model = new News();
 
-        if ($model->load(Yii::$app->request->post())) {
-            $model->start = strtotime($model->start);
-            $model->end = strtotime($model->end);
-            $model->save();
-            $clients = Client::find()->all();
-            $token = '1185997109:AAFqTaqEhTobFjrR9_wYWA70gGvyBcDYfzI';
-            foreach ($clients as $client) {
-                $chat_id = $client->chat_id;
-                $url = "https://api.telegram.org/bot$token/sendPhoto?chat_id=$chat_id";
-                $post_fields = [
-                    'chat_id'   => $chat_id,
-                    'photo' => new CURLFile(Url::to('@webroot').$model->img)
-                ];
-                $this->curlBot($url, $post_fields);
-            }
-
+        if ($model->load(Yii::$app->request->post()) && $model->save()) {
             return $this->redirect(['view', 'id' => $model->id]);
         }
 
@@ -123,18 +75,8 @@ class NewsController extends Controller
         ]);
     }
 
-
-    public function curlBot($url, $post_fields){
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_HTTPHEADER, ["Content-Type:multipart/form-data"]);
-        curl_setopt($ch, CURLOPT_URL, $url);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, $post_fields);
-        $output = curl_exec($ch);
-    }
-
     /**
-     * Updates an existing Sale model.
+     * Updates an existing News model.
      * If update is successful, the browser will be redirected to the 'view' page.
      * @param integer $id
      * @return mixed
@@ -144,10 +86,7 @@ class NewsController extends Controller
     {
         $model = $this->findModel($id);
 
-        if ($model->load(Yii::$app->request->post())) {
-            $model->start = strtotime($model->start);
-            $model->end = strtotime($model->end);
-            $model->save();
+        if ($model->load(Yii::$app->request->post()) && $model->save()) {
             return $this->redirect(['view', 'id' => $model->id]);
         }
 
@@ -157,7 +96,7 @@ class NewsController extends Controller
     }
 
     /**
-     * Deletes an existing Sale model.
+     * Deletes an existing News model.
      * If deletion is successful, the browser will be redirected to the 'index' page.
      * @param integer $id
      * @return mixed
@@ -171,7 +110,7 @@ class NewsController extends Controller
     }
 
     /**
-     * Finds the Sale model based on its primary key value.
+     * Finds the News model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.
      * @param integer $id
      * @return News the loaded model
@@ -184,23 +123,5 @@ class NewsController extends Controller
         }
 
         throw new NotFoundHttpException('The requested page does not exist.');
-    }
-
-
-    public function actionAll(){
-        Yii::$app->response->format = Response::FORMAT_JSON;
-        return News::find()->where(['status' => 1])->all();
-    }
-
-    public function actionLast(){
-        Yii::$app->response->format = Response::FORMAT_JSON;
-        $rate = News::find()->where(['status' => 1])->orderBy(['id' => SORT_DESC])->one();
-        return $rate;
-    }
-
-    public function actionOne($id){
-        Yii::$app->response->format = Response::FORMAT_JSON;
-        $rate = $this->findModel($id);
-        return $rate;
     }
 }

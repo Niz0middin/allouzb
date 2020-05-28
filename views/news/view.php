@@ -11,7 +11,7 @@ $this->params['breadcrumbs'][] = ['label' => 'Новости', 'url' => ['index'
 $this->params['breadcrumbs'][] = $this->title;
 \yii\web\YiiAsset::register($this);
 ?>
-<div class="sale-view">
+<div class="news-view">
 
     <h1><?= Html::encode($this->title) ?></h1>
 
@@ -31,35 +31,26 @@ $this->params['breadcrumbs'][] = $this->title;
         'attributes' => [
             'id',
             [
-                'attribute' => 'start',
-                'value' => function($model){
-                    return date('Y-m-d h:i', $model->start);
-                }
-            ],
-            [
-                'attribute' => 'end',
-                'value' => function($model){
-                    return date('Y-m-d h:i', $model->end);
-                }
-            ],
-            [
-                'attribute' => 'status',
-                'value' => function($model){
-                    if ($model->status == 1){
-                        return 'Активный';
-                    }
-                    else{
-                        return 'Неактивный';
-                    }
-                }
-            ],
-            [
                 'attribute' => 'img',
                 'format' => 'raw',
                 'value' => function($model){
-                    return "<img style='max-height: 200px' src='$model->img'>";
+                    return "<img style='max-height: 100px' src='$model->img'>";
                 }
             ],
+            'text:raw',
+            [
+                'attribute' => 'created_at',
+                'value' => function ($model) {
+                    return date('Y-m-d h:i', $model->created_at);
+                },
+            ],
+            [
+                'attribute' => 'updated_at',
+                'value' => function ($model) {
+                    return date('Y-m-d h:i', $model->updated_at);
+                },
+            ],
+            'status',
         ],
     ]) ?>
 

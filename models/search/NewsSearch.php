@@ -7,7 +7,7 @@ use yii\data\ActiveDataProvider;
 use app\models\News;
 
 /**
- * SaleSearch represents the model behind the search form of `app\models\Sale`.
+ * NewsSearch represents the model behind the search form of `app\models\News`.
  */
 class NewsSearch extends News
 {
@@ -18,7 +18,7 @@ class NewsSearch extends News
     {
         return [
             [['id', 'status'], 'integer'],
-            [[/*'img', */'start', 'end'], 'safe'],
+            [['img', 'text', 'created_at', 'updated_at'], 'safe'],
         ];
     }
 
@@ -59,20 +59,17 @@ class NewsSearch extends News
         // grid filtering conditions
         $query->andFilterWhere([
             'id' => $this->id,
+//            'created_at' => $this->created_at,
+            'updated_at' => $this->updated_at,
             'status' => $this->status,
         ]);
-        if (!empty($this->start)){
-            $query->andFilterWhere([
-                'start' => strtotime($this->start),
-            ]);
-        }
-        if (!empty($this->end)){
-            $query->andFilterWhere([
-                'end' => strtotime($this->end),
-            ]);
+
+        if(!empty($this->created_at)){
+            $query->andFilterWhere(['between', 'created_at', strtotime($this->created_at),strtotime($this->created_at)+86399]);
         }
 
-        $query->andFilterWhere(['like', 'img', $this->img]);
+        $query->andFilterWhere(['like', 'img', $this->img])
+            ->andFilterWhere(['like', 'text', $this->text]);
 
         return $dataProvider;
     }
