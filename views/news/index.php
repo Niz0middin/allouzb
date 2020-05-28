@@ -1,5 +1,6 @@
 <?php
 
+use kartik\date\DatePicker;
 use kartik\datetime\DateTimePicker;
 use yii\helpers\Html;
 use yii\grid\GridView;
@@ -11,12 +12,7 @@ use yii\grid\GridView;
 $this->title = 'Новости';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
-<style>
-    input{
-        background-color: white!important;
-    }
-</style>
-<div class="sale-index">
+<div class="news-index">
 
     <h1><?= Html::encode($this->title) ?></h1>
 
@@ -34,58 +30,33 @@ $this->params['breadcrumbs'][] = $this->title;
 
 //            'id',
             [
-                'attribute' => 'start',
-                'value' => function ($model) {
-                    return date('Y-m-d h:i', $model->start);
-                },
-                'filter' => DateTimePicker::widget([
-                    'model' => $searchModel,
-                    'attribute' => 'start',
-                    'options' =>[
-                        'readonly'=>'true'
-                    ],
-                    'pluginOptions' => [
-                        'autoclose' => true,
-//                        'format' => 'dd.mm.yyyy hh:ii'
-                    ]
-                ])
-            ],
-            [
-                'attribute' => 'end',
-                'value' => function ($model) {
-                    return date('Y-m-d h:i', $model->end);
-                },
-                'filter' => DateTimePicker::widget([
-                    'model' => $searchModel,
-                    'attribute' => 'end',
-                    'options' =>[
-                        'readonly'=>'true'
-                    ],
-                    'pluginOptions' => [
-                        'autoclose' => true,
-//                        'format' => 'dd.mm.yyyy hh:ii'
-                    ]
-                ])
-            ],
-            [
-                'attribute' => 'status',
-                'filter' => [1=>'Активный', 0=>'Неактивный'],
-                'value' => function($model){
-                    if ($model->status == 1){
-                        return 'Активный';
-                    }
-                    else{
-                        return 'Неактивный';
-                    }
-                }
-            ],
-            [
                 'attribute' => 'img',
                 'format' => 'raw',
                 'value' => function($model){
                     return "<img style='max-height: 100px' src='$model->img'>";
                 }
             ],
+            'text:raw',
+            [
+                'attribute' => 'created_at',
+                'value' => function ($model) {
+                    return date('Y-m-d', $model->created_at);
+                },
+                'filter' => DatePicker::widget([
+                    'model' => $searchModel,
+                    'attribute' => 'created_at',
+                    'options' =>[
+                        'readonly'=>'true'
+                    ],
+                    'pluginOptions' => [
+                        'autoclose' => true,
+                        'format' => 'yyyy-mm-dd',
+                        'todayHighlight' => true
+                    ]
+                ])
+            ],
+//            'updated_at',
+            //'status',
 
             ['class' => 'yii\grid\ActionColumn'],
         ],

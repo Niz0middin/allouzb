@@ -8,7 +8,7 @@ use yii\widgets\ActiveForm;
 /* @var $form yii\widgets\ActiveForm */
 ?>
 
-<div class="sale-search">
+<div class="news-search">
 
     <?php $form = ActiveForm::begin([
         'action' => ['index'],
@@ -19,11 +19,13 @@ use yii\widgets\ActiveForm;
 
     <?= $form->field($model, 'img') ?>
 
-    <?= $form->field($model, 'start') ?>
+    <?= $form->field($model, 'text') ?>
 
-    <?= $form->field($model, 'end') ?>
+    <?= $form->field($model, 'created_at') ?>
 
-    <?= $form->field($model, 'status') ?>
+    <?= $form->field($model, 'updated_at') ?>
+
+    <?php // echo $form->field($model, 'status') ?>
 
     <div class="form-group">
         <?= Html::submitButton('Search', ['class' => 'btn btn-primary']) ?>
