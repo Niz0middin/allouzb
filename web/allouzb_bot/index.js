@@ -16,26 +16,32 @@ const bot = new TelegramBot(config.TOKEN,{
 
 bot.on('message', msg=>{
     counter=0
-    
     const chatId = helper.getChatId(msg)
-
     var objHold={hold:0}
+    
     switch(msg.text){
         
         case kb.home.catalogs:
-            bot.sendMessage(chatId,'Каталог',{
+            bot.sendMessage(chatId,'Выберите раздел чтобы вывести список товаров:',{
                 reply_markup:{
                     keyboard:keyboard.back,
                     resize_keyboard:true
                 }
             })
             .then(()=>{
+                fetch('http://allouzb/category/get')
+                    .then(response => response.json())
+                    .then(data=>{
+                        var send_to_root=key_value_pairs(data.data)
+                        
+                        bot.sendMessage(chatId,'Каталог',{
+                            reply_markup:{
+                                inline_keyboard:send_to_root
+                            }
+                        })
+                    })
                 
-                bot.sendMessage(chatId,'Выберите раздел чтобы вывести список товаров:',{
-                    reply_markup:{
-                        inline_keyboard:ikb.catalogues
-                    }
-                })
+                
             })
 
             break
@@ -154,10 +160,73 @@ bot.on('message', msg=>{
 
 
 bot.on('callback_query',query=>{
+    var status,sub_category
     
+    fetch(`http://allouzb/category/get?id=${query.data}`)
+        .then(response => response.json())
+        .then(data=>{
+            
+            status = data.status //0 -keyboard yoki 1-good
+            sub_category = key_value_pairs(data.data) //keyobard
+            //callback_data = query.data  //callback_data bu id shuni id ga berish kk
+            
+            if(data.parent!=null){
+                sub_category.push([{text:'↖️ Вернуться в суб-каталог',callback_data:data.parent}])
+            }
+            
+            //keyboard holati uchun
+        if(status==0){
+            console.log('status 0 keyobard')
+            
+            bot.deleteMessage(query.message.chat.id,query.message.message_id)
+            .then(()=>{
+                bot.sendMessage(query.message.chat.id,'Выберите раздел чтобы вывести список товаров:',{
+                    reply_markup:{
+                        inline_keyboard:sub_category, //shuyoga api digi DATA ni assign
+                    }
+                })
+                
+            })
+
+        }
+        //data holati uchun
+        else if(status==1){
+            console.log('status 1 data')
+            var goods = data.data
+            var good_counter=0
+            
+            goods.forEach((good)=>{
+                good_counter=good_counter+1
+                //console.log(good)
+                bot.sendChatAction(query.message.chat.id,'upload_photo')
+                .then(()=>{
+                    bot.sendPhoto(query.message.chat.id,'.'+good.img.substr(10,good.img.length),{
+                        caption:good.description,
+                        reply_markup:{
+                            inline_keyboard:[
+                                [{text:'Купить - '+good.cost+' UZS' ,callback_data:'add'+' '+good.cost+' '+good.id+' '+counter+' '+good.description}]
+                            ]
+                        }
+                    })
+                    .then(()=>{
+                        bot.sendMessage(query.message.chat.id,'Показано __ товара из '+good_counter)
+                        //console.log(query.message.chat.id+'\n'+query.message.message_id)
+                        }).catch((err)=>{console.log(err)})
+                })
+            })
+
+///////////////////////////////////////
+        }
+        else{
+            console.log('status is not either 0 or 1\nэта категория пока пуста')
+            bot.sendMessage(query.message.chat.id,responses.empty_category)
+        }
+        
+       }) 
     
   
-    if(query.data.slice(0,2)=='sc'){
+//////////////////////////////////////////////////////////////////////////////
+    /*if(query.data.slice(0,2)=='sc'){
         bot.deleteMessage(query.message.chat.id,query.message.message_id)
         .then(()=>{
             bot.sendMessage(query.message.chat.id,'Выберите раздел чтобы вывести список товаров:',{
@@ -167,10 +236,10 @@ bot.on('callback_query',query=>{
             })
         })
         
-    }
+    }*/
     
     
-    else if(query.data.slice(0,3)=='add'){
+     if(query.data.slice(0,3)=='add'){
     // console.log(query.data)
      //console.log(query.message.chat.id+'\n'+query.message.message_id)
      dataObj=query.data.split(" ")
@@ -298,3 +367,33 @@ bot.onText(/\/start/,msg=>{
             var item = new Item(id,cost,count,description);
             cart.push(item);
         }
+
+
+
+
+//////////////```Plugins```///////////////////////////
+function key_value_pairs(obj) 
+   {
+    var keys = _keys(obj);
+    var length = keys.length;
+    var pairs = Array(length);
+    for (var i = 0; i < length; i++) 
+    {
+      pairs[i] = [obj[keys[i]]];
+    }
+    return pairs;
+  }
+
+function _keys(obj) 
+  {
+    if (!isObject(obj)) return [];
+    if (Object.keys) return Object.keys(obj);
+    var keys = [];
+    for (var key in obj) if (_.has(obj, key)) keys.push(key);
+    return keys;
+  }
+ function isObject(obj) 
+ {
+    var type = typeof obj;
+    return type === 'function' || type === 'object' && !!obj;
+  }

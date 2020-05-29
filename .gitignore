@@ -33,4 +33,4 @@ tests/_support/_generated
 /.vagrant
 
 #telegram bot
-/web/allouzbbot/node_modules/*
+/web/allouzb_bot/node_modules/*
