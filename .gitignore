@@ -31,3 +31,6 @@ tests/_support/_generated
 
 #vagrant folder
 /.vagrant
+
+#telegram bot
+/web/allouzb_bot/node_modules/*
