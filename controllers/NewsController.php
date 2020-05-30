@@ -8,6 +8,7 @@ use app\models\search\NewsSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use yii\web\Response;
 
 /**
  * NewsController implements the CRUD actions for News model.
@@ -123,5 +124,15 @@ class NewsController extends Controller
         }
 
         throw new NotFoundHttpException('The requested page does not exist.');
+    }
+
+    public function actionGet($id=null){
+        Yii::$app->response->format = Response::FORMAT_JSON;
+        if ($id == null || $id == 0){
+            $model = News::find()->orderBy(['id' => SORT_DESC])->one();
+        }else{
+            $model = News::find()->where(['<', 'id', $id])->orderBy(['id' => SORT_DESC])->one();
+        }
+        return $model;
     }
 }
