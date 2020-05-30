@@ -22,9 +22,9 @@ bot.on('message', msg=>{
     switch(msg.text){
         
         case kb.home.catalogs:
-            bot.sendMessage(chatId,'Выберите раздел чтобы вывести список товаров:',{
+            bot.sendMessage(chatId,'Каталог',{
                 reply_markup:{
-                    keyboard:keyboard.back,
+                    keyboard:keyboard.exit,
                     resize_keyboard:true
                 }
             })
@@ -34,7 +34,7 @@ bot.on('message', msg=>{
                     .then(data=>{
                         var send_to_root=key_value_pairs(data.data)
                         
-                        bot.sendMessage(chatId,'Каталог',{
+                        bot.sendMessage(chatId,'Выберите раздел чтобы вывести список товаров:',{
                             reply_markup:{
                                 inline_keyboard:send_to_root
                             }
@@ -131,6 +131,27 @@ bot.on('message', msg=>{
                 }
             })
             break
+        case kb.exit.exit:
+            bot.sendMessage(chatId,'Главный меню',{
+                reply_markup:{
+                    keyboard: keyboard.home,
+                    resize_keyboard: true 
+                }
+            })
+            break
+        case kb.exit.mcatalogue:
+            fetch('http://allouzb/category/get')
+            .then(response => response.json())
+            .then(data=>{
+                var send_to_root=key_value_pairs(data.data)
+                //console.log(send_to_root)
+                bot.sendMessage(chatId,'Выберите один из каталогов:',{
+                    reply_markup:{
+                        inline_keyboard:send_to_root
+                    }
+                })
+            })
+            break
             default:{
                 console.log(objHold.hold)
                 if(objHold.hold==1){
@@ -161,6 +182,81 @@ bot.on('message', msg=>{
 
 bot.on('callback_query',query=>{
     var status,sub_category
+
+    if(query.data.slice(0,3)=='add'){
+        // console.log(query.data)
+         //console.log(query.message.chat.id+'\n'+query.message.message_id)
+         dataObj=query.data.split(" ")
+         
+         
+         console.log('here add>>>>  '+dataObj[0]) //add
+         console.log('here cost>>>>  '+dataObj[1]) //cost
+         console.log('here id>>>>  '+dataObj[2]) //id
+            counter=parseInt(dataObj[3])+1
+         console.log('num of>>>> '+counter) //counter
+        
+         
+         
+         var description=dataObj.slice(4,dataObj.length).join(" ")
+         
+         addItemToCart(dataObj[2],dataObj[1],counter,description)
+    
+           bot.editMessageCaption(description,{
+                chat_id:query.message.chat.id,
+                message_id: query.message.message_id,
+                reply_markup:{
+                    inline_keyboard:[
+                        [{text:'Купить - '+dataObj[1]+' UZS'+' ('+counter +'шт.)',callback_data:'add'+' '+dataObj[1]+' '+dataObj[2]+' '+counter+' '+description}],
+                        [{text:'В корзину',callback_data:'bin'}]
+                    ]
+                }
+            }).catch((err)=>{console.log(err)})
+    
+    
+        }
+        else if(query.data=='bin'){
+            console.log('bin')
+            console.log('look>>>>>>>>>>>>>'+JSON.stringify(cart))
+
+            
+            var calculated_cost = cart[0].cost*cart[0].count
+            bot.sendMessage(query.message.chat.id,'Корзина:\n '+cart[0].cost+' UZS '+' x '+cart[0].count+' = '+calculated_cost+' UZS ',{
+                reply_markup:{
+                    inline_keyboard: ikb.cartKeyboard
+                }
+            }).then(()=>{
+                //id berib url_pic olish
+            })
+    
+        }else{
+
+        
+        /*else{
+            var goods = ikb[query.data]
+            var good_counter=0
+            goods.forEach((good)=>{
+                good_counter=good_counter+1
+                //console.log(good)
+                bot.sendPhoto(query.message.chat.id,good.picture,{
+                    caption:good.description,
+                    reply_markup:{
+                        inline_keyboard:[
+                            [{text:'Купить - '+good.cost+' UZS' ,callback_data:'add'+' '+good.cost+' '+good.id+' '+counter+' '+good.description}]
+                        ]
+                    }
+                })
+                .then(()=>{
+                    
+                    bot.sendMessage(query.message.chat.id,'Показано __ товара из '+good_counter)
+                    //console.log(query.message.chat.id+'\n'+query.message.message_id)
+                }).catch((err)=>{console.log(err)})
+                
+            })
+        }*/
+        //////////////////////////////////////////////////////
+
+
+
     
     fetch(`http://allouzb/category/get?id=${query.data}`)
         .then(response => response.json())
@@ -170,9 +266,9 @@ bot.on('callback_query',query=>{
             sub_category = key_value_pairs(data.data) //keyobard
             //callback_data = query.data  //callback_data bu id shuni id ga berish kk
             
-            if(data.parent!=null){
-                sub_category.push([{text:'↖️ Вернуться в суб-каталог',callback_data:data.parent}])
-            }
+        if(data.parent!=null){
+            sub_category.push([{text:'↖️ Вернуться в суб-каталог',callback_data:data.parent}])
+        }
             
             //keyboard holati uchun
         if(status==0){
@@ -197,10 +293,10 @@ bot.on('callback_query',query=>{
             
             goods.forEach((good)=>{
                 good_counter=good_counter+1
-                //console.log(good)
+                console.log('IMAGE  *****'+good.img)
                 bot.sendChatAction(query.message.chat.id,'upload_photo')
                 .then(()=>{
-                    bot.sendPhoto(query.message.chat.id,'.'+good.img.substr(10,good.img.length),{
+                    bot.sendPhoto(query.message.chat.id,'.'+good.img.substr(12,good.img.length),{
                         caption:good.description,
                         reply_markup:{
                             inline_keyboard:[
@@ -215,16 +311,18 @@ bot.on('callback_query',query=>{
                 })
             })
 
-///////////////////////////////////////
+
         }
+        
+
         else{
             console.log('status is not either 0 or 1\nэта категория пока пуста')
-            bot.sendMessage(query.message.chat.id,responses.empty_category)
+            bot.sendMessage(query.message.chat.id,'⚠️ Извините, эта категория пока пуста!')
         }
         
        }) 
     
-  
+    }
 //////////////////////////////////////////////////////////////////////////////
     /*if(query.data.slice(0,2)=='sc'){
         bot.deleteMessage(query.message.chat.id,query.message.message_id)
@@ -239,93 +337,7 @@ bot.on('callback_query',query=>{
     }*/
     
     
-     if(query.data.slice(0,3)=='add'){
-    // console.log(query.data)
-     //console.log(query.message.chat.id+'\n'+query.message.message_id)
-     dataObj=query.data.split(" ")
      
-     
-     console.log('here add>>>>  '+dataObj[0]) //add
-     console.log('here cost>>>>  '+dataObj[1]) //cost
-     console.log('here id>>>>  '+dataObj[2]) //id
-        counter=parseInt(dataObj[3])+1
-     console.log('num of>>>> '+counter) //counter
-    // console.log('picture_url: ',dataObj[4]) //file_id
-     
-     
-     var description=dataObj.slice(4,dataObj.length).join(" ")
-     //korzina.push(dataObj[2],dataObj[1],(parseInt(dataObj[3])+1))
-     addItemToCart(dataObj[2],dataObj[1],counter,description)
-     
-     
-     //console.log(JSON.stringify(query.message.text))
-     
-     
-     /*bot.editMessageReplyMarkup(
-        query.message.chat.id,
-        query.message.message_id,
-        reply_markup=JSON.stringify({
-            "inline_keyboard":[
-                [{"text":'Купить - '+dataObj[1]+' UZS'+' ('+counter +'шт.)',"callback_data":'add'+' '+dataObj[1]+' '+dataObj[2]+' '+counter}],
-                [{"text":'В корзину',"callback_data":'bin'}]
-            ]
-        
-        })
-    
-      )*/
-
-       bot.editMessageCaption(description,{
-            chat_id:query.message.chat.id,
-            message_id: query.message.message_id,
-            reply_markup:{
-                inline_keyboard:[
-                    [{text:'Купить - '+dataObj[1]+' UZS'+' ('+counter +'шт.)',callback_data:'add'+' '+dataObj[1]+' '+dataObj[2]+' '+counter+' '+description}],
-                    [{text:'В корзину',callback_data:'bin'}]
-                ]
-            }
-        }).catch((err)=>{console.log(err)})
-
-
-    }
-    else if(query.data=='bin'){
-        console.log('bin')
-        console.log('look>>>>>>>>>>>>>'+JSON.stringify(cart))
-        bot.sendMessage(query.message.chat.id,'Корзина:\n ',{
-            reply_markup:{
-                inline_keyboard: ikb.cartKeyboard
-            }
-        }).then(()=>{
-            //id berib url_pic olish
-        })
-
-    }
-    else{
-        var goods = ikb[query.data]
-        var good_counter=0
-        goods.forEach((good)=>{
-            good_counter=good_counter+1
-            //console.log(good)
-            bot.sendPhoto(query.message.chat.id,good.picture,{
-                caption:good.description,
-                reply_markup:{
-                    inline_keyboard:[
-                        [{text:'Купить - '+good.cost+' UZS' ,callback_data:'add'+' '+good.cost+' '+good.id+' '+counter+' '+good.description}]
-                    ]
-                }
-            })
-            .then(()=>{
-                
-                bot.sendMessage(query.message.chat.id,'Показано __ товара из '+good_counter)
-                //console.log(query.message.chat.id+'\n'+query.message.message_id)
-            }).catch((err)=>{console.log(err)})
-            
-        })
-           
-       
-            
-        
-       
-    }
 
 
 })
