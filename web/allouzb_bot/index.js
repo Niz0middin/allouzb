@@ -12,7 +12,7 @@ helper.logStart()
 const bot = new TelegramBot(config.TOKEN,{
     polling: true
 })
-
+var indexOf=0
 
 bot.on('message', msg=>{
     counter=0
@@ -33,7 +33,6 @@ bot.on('message', msg=>{
                     .then(response => response.json())
                     .then(data=>{
                         var send_to_root=key_value_pairs(data.data)
-                        
                         bot.sendMessage(chatId,'Выберите раздел чтобы вывести список товаров:',{
                             reply_markup:{
                                 inline_keyboard:send_to_root
@@ -50,18 +49,25 @@ bot.on('message', msg=>{
         case kb.home.orders:
             break
         case kb.home.news:
-           //bot.sendPhoto(chatId,fs.readFileSync(__dirname + '/news/news.png'))
-           bot.sendChatAction(chatId,"upload_photo").then(()=>{
-            bot.sendPhoto(chatId,'./news/news.png') 
-            .then((msg)=>{
-                bot.sendMessage(chatId,'01.01.1990'+'\n'+'Information provided in news',{
-                    reply_markup:{
-                        keyboard: keyboard.news,
-                        resize_keyboard:true
-                    }
-                })
+            fetch('http://allouzb/news/get')
+            .then(response => response.json())
+            .then(data=>{
+            
+                bot.sendChatAction(chatId,"upload_photo").then(()=>{
+                console.log(data.created_at)
+                    bot.sendPhoto(chatId,'.'+data.img.substr(12,data.img.length,{
+                    caption: data.created_at
+                    })).then(()=>{
+                        bot.sendMessage(chatId,data.text,{
+                            reply_markup:{
+                                keyboard: keyboard.news,
+                                resize_keyboard:true
+                            }
+                        })
+                    })
+                 
+              }) 
             })
-           })
             break
         //more knopka bosilganda
         case kb.more.more:
@@ -182,6 +188,7 @@ bot.on('message', msg=>{
 
 bot.on('callback_query',query=>{
     var status,sub_category
+    var calculated_cost
 
     if(query.data.slice(0,3)=='add'){
         // console.log(query.data)
@@ -219,7 +226,7 @@ bot.on('callback_query',query=>{
             console.log('look>>>>>>>>>>>>>'+JSON.stringify(cart))
 
             
-            var calculated_cost = cart[0].cost*cart[0].count
+            calculated_cost = cart[0].cost*cart[0].count
             bot.sendMessage(query.message.chat.id,'Корзина:\n '+cart[0].cost+' UZS '+' x '+cart[0].count+' = '+calculated_cost+' UZS ',{
                 reply_markup:{
                     inline_keyboard: ikb.cartKeyboard
@@ -227,8 +234,61 @@ bot.on('callback_query',query=>{
             }).then(()=>{
                 //id berib url_pic olish
             })
+            console.log('PREV message_id:>>  '+query.message.message_id)
     
-        }else{
+        }else if(query.data=='❌'){
+            removeItemFromCart(dataObj[2])
+            console.log('cart '+JSON.stringify(cart))
+        }
+        else if(query.data=='▶️'){
+            indexOf++;
+            console.log('indexOf*** '+indexOf)
+            bot.editMessageText('Корзина:\n '+cart[indexOf].cost+' UZS '+' x '+cart[indexOf].count+' = '+calculated_cost+' UZS ',{
+                chat_id: query.message.chat.id,
+                message_id:query.message.message_id,
+                reply_markup:{
+                    inline_keyboard:ikb.cartKeyboard
+                }
+            })
+        }
+        else if(query.data=='🔻'){
+            console.log('indexOf*** '+indexOf)
+            if(cart[indexOf].count!=1){
+                decrementItemInCart(dataObj[2])
+                calculated_cost = cart[indexOf].cost*cart[indexOf].count
+                bot.editMessageText('Корзина:\n '+cart[indexOf].cost+' UZS '+' x '+cart[indexOf].count+' = '+calculated_cost+' UZS ',{
+                    chat_id: query.message.chat.id,
+                    message_id:query.message.message_id,
+                    reply_markup:{
+                        inline_keyboard:ikb.cartKeyboard
+                    }
+                })
+            }else{console.log('1ta qoldi')}
+
+            /*
+            console.log('THEN message_id:>>  '+query.message.message_id)
+            console.log('cart[0].id>>  '+cart[0].id)
+            console.log('dataObj[2]>>  '+dataObj[2])
+            console.log('cart>>>>> '+JSON.stringify(cart))*/
+            
+        }else if(query.data == '🔺'){
+            console.log('indexOf**** '+indexOf)
+            
+            incrementItemInCart(dataObj[2])
+            calculated_cost = cart[indexOf].cost*cart[indexOf].count
+            
+            console.log('Qara buyoga>>>>>>>'+calculated_cost)
+                
+            bot.editMessageText('Корзина:\n '+cart[indexOf].cost+' UZS '+' x '+cart[indexOf].count+' = '+calculated_cost+' UZS ',{
+                chat_id: query.message.chat.id,
+                message_id:query.message.message_id,
+                reply_markup:{
+                    inline_keyboard:ikb.cartKeyboard
+                }
+            })
+
+        }
+        else{
 
         
         /*else{
@@ -293,7 +353,7 @@ bot.on('callback_query',query=>{
             
             goods.forEach((good)=>{
                 good_counter=good_counter+1
-                console.log('IMAGE  *****'+good.img)
+                //console.log('IMAGE  *****'+good.img)
                 bot.sendChatAction(query.message.chat.id,'upload_photo')
                 .then(()=>{
                     bot.sendPhoto(query.message.chat.id,'.'+good.img.substr(12,good.img.length),{
@@ -368,11 +428,40 @@ bot.onText(/\/start/,msg=>{
             this.count = count
             this.description = description
         }
+        function removeItemFromCart(id){
+            for(var i in cart){
+                if(cart[i].id===id){
+                    cart.splice(i,1);
+                    break;
+                }
+            }
+        }
+        function incrementItemInCart(id){
+            for(var i in cart){
+                if(cart[i].id===id){
+                    cart[i].count++;
+                    break
+                }
+            }
+        }
+        function decrementItemInCart(id){
+            for(var i in cart){
+                if(cart[i].id===id){
+                    if(cart[i].count>1){
+                        cart[i].count--;
+                    }else{
+                        console.log('at least 1 item you should posess')
+                        break
+                    }    
+                    break
+                }
+            }
+        }
         
         function addItemToCart(id,cost,count,description){
             for(var i in cart){
                 if(cart[i].id === id){
-                    cart[i].count ++
+                    cart[i].count ++;
                     return
                 }
             }
