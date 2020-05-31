@@ -17,6 +17,10 @@ module.exports={
     ],
     news:[
         [kb.back.backward,kb.more.more]
+    ],
+    exit:[
+        [kb.exit.mcatalogue],
+        [kb.exit.exit]
     ]
 
 }
