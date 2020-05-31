@@ -133,6 +133,8 @@ class NewsController extends Controller
         }else{
             $model = News::find()->where(['<', 'id', $id])->orderBy(['id' => SORT_DESC])->one();
         }
+        $model->created_at = date('d.m.Y', $model->created_at);
+        $model->updated_at = date('d.m.Y', $model->updated_at);
         return $model;
     }
 }

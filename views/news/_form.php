@@ -26,9 +26,7 @@ use yii\widgets\ActiveForm;
     ]);
     ?>
 
-    <?= $form->field($model, 'text')->widget(CKEditor::className(), [
-        'options' => ['rows' => 6],
-    ]) ?>
+    <?= $form->field($model, 'text')->textarea(['rows' => 6]) ?>
 
     <?= $form->field($model, 'status')->dropDownList([1 => 'Активный', 0 => 'Неактивный']) ?>
 
