@@ -145,7 +145,7 @@ class ProductController extends Controller
 
     public function actionImg($id){
         Yii::$app->response->format = Response::FORMAT_JSON;
-        $model = $this->findModel($id);
+        $model = Product::findOne($id);
         if (!empty($model)) {
             $img = $model->img;
             $description = $model->description;
