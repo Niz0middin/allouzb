@@ -148,9 +148,14 @@ class ProductController extends Controller
         $model = $this->findModel($id);
         if (!empty($model)) {
             $img = $model->img;
+            $description = $model->description;
         }else{
             $img = null;
+            $description = null;
         }
-        return ['img' => $img];
+        return [
+            'img' => $img,
+            'description' => $description
+        ];
     }
 }
