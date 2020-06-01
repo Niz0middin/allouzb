@@ -143,7 +143,7 @@ class ProductController extends Controller
         throw new NotFoundHttpException('The requested page does not exist.');
     }
 
-    public function actionGet($id){
+    public function actionImg($id){
         Yii::$app->response->format = Response::FORMAT_JSON;
         $model = Product::findOne($id);
 //        if (!empty($model)) {
