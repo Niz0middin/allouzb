@@ -27,9 +27,7 @@ bot.onText(/\/start/,msg=>{
 bot.on('message', msg=>{
     counter=0
     const chatId = helper.getChatId(msg)
-    var cartByChatId = cart.filter(item =>item.chatId==msg.chat.id)
-    //indexOf = cart.filter(item =>item.chatId==msg.chat.id).length
-    console.log('cartByChatId length>>> '+indexOf)
+    
     
     switch(msg.text){
         case kb.home.catalogs:
@@ -55,30 +53,29 @@ bot.on('message', msg=>{
             })
             break
         case kb.home.bin:
-            console.log('BINda>>'+JSON.stringify(cartByChatId))
+            console.log('BINda>>'+JSON.stringify(cart))
             
-            if(cartByChatId.length == 0){
+            if(cart.length == 0){
                 console.log('cart null')
                 bot.sendMessage(chatId,'В корзине пусто 🛒\n Посмотрите Каталог, там много интересного')
 
             }else{
-                indexOf=0;
-                calculated_cost = cartByChatId[0].cost*cartByChatId[0].count
-                dataObj[2]=cartByChatId[indexOf].id
+                calculated_cost = cart[0].cost*cart[0].count
+                dataObj[2]=cart[indexOf].id
             
                 var total_amount = 0    
-                for(var i in cartByChatId){
-                    total_amount=total_amount + parseFloat(cartByChatId[i].cost)*cartByChatId[i].count
+                for(var i in cart){
+                    total_amount=total_amount + parseFloat(cart[i].cost)*cart[i].count
                 }
             //console.log('total_amount: '+total_amount)   
 
                 fetch(`http://allouzb/product/img?id=${dataObj[2]}`).then(response => response.json())
                 .then(data=>{
-                    bot.sendMessage(chatId,'Корзина:\n '+cartByChatId[0].cost+' UZS '+' x '+cartByChatId[0].count+' = '+calculated_cost+' UZS '+'\n\n'+'<a href="allouzb'+data.img+'">'+data.description+'</a>',{
+                    bot.sendMessage(chatId,'Корзина:\n '+cart[0].cost+' UZS '+' x '+cart[0].count+' = '+calculated_cost+' UZS '+'\n\n'+'<a href="allouzb'+data.img+'">'+data.description+'</a>',{
                         reply_markup:{
                             inline_keyboard: [
-                                [{text:'❌',callback_data:'❌'},{text:'🔻',callback_data:'🔻'},{text:cartByChatId[indexOf].count+' шт.',callback_data:'c'},{text:'🔺',callback_data:'🔺'}],
-                                [{text:'◀️',callback_data:'◀️'},{text: (indexOf+1)+'/'+cartByChatId.length,callback_data:'nu'},{text:'▶️',callback_data:'▶️'}],
+                                [{text:'❌',callback_data:'❌'},{text:'🔻',callback_data:'🔻'},{text:cart[indexOf].count+' шт.',callback_data:'c'},{text:'🔺',callback_data:'🔺'}],
+                                [{text:'◀️',callback_data:'◀️'},{text: (indexOf+1)+'/'+cart.length,callback_data:'nu'},{text:'▶️',callback_data:'▶️'}],
                                 [{text:'✅ Заказ на '+total_amount+' UZS Оформить?',callback_data:'formalize'}]
                             ]
                         },
@@ -209,11 +206,11 @@ bot.on('message', msg=>{
         case '🚚Доставить/Yetqazib\nberish':
             var total_amount = 0    
             
-            for(var i in cartByChatId){
-                total_amount=total_amount + parseFloat(cartByChatId[i].cost)*cartByChatId[i].count
+            for(var i in cart){
+                total_amount=total_amount + parseFloat(cart[i].cost)*cart[i].count
             }
 
-            console.log('cartByChatId>> '+JSON.stringify(cartByChatId))
+            console.log('cart>> '+JSON.stringify(cart))
             console.log('total_amount>> '+total_amount)
             console.log('chatid>> '+msg.from.id)
             console.log('firstname>> '+msg.from.first_name)
@@ -259,7 +256,7 @@ bot.on('message', msg=>{
 bot.on('callback_query',query=>{
     var status,sub_category
     var calculated_cost
-    var cartByChatId = cart.filter(item =>item.chatId==query.message.chat.id)
+    
     
 
     if(query.data.slice(0,3)=='add'){
@@ -267,59 +264,52 @@ console.log('add kupit knopka')
         
         dataObj=query.data.split(" ")
         counter=parseInt(dataObj[3])+1
-
-        fetch(`http://allouzb/product/img?id=${dataObj[2]}`).then(response => response.json())
-        .then(data=>{
+        var description=dataObj.slice(4,dataObj.length).join(" ")
         
-        //var description=dataObj.slice(4,dataObj.length).join(" ")
-        var description = data.description
          
          //console.log('here add>>>>  '+dataObj[0]) //add digan text
          console.log('here id>>>>  '+dataObj[2]) //id
          console.log('here cost>>>>  '+dataObj[1]) //cost
          console.log('num of>>>> '+counter) //counter
          console.log('descript>>> '+description) //description
-//f
-        addItemToCart(dataObj[2],dataObj[1],counter,description,query.message.chat.id)
+        
+        addItemToCart(dataObj[2],dataObj[1],counter,description)
 console.log('cart added'+JSON.stringify(cart))
-
         bot.editMessageCaption(description,{
             chat_id:query.message.chat.id,
             message_id: query.message.message_id,
             reply_markup:{
                 inline_keyboard:[
-                    [{text:'Купить - '+dataObj[1]+' UZS'+' ('+counter +'шт.)',callback_data:'add'+' '+dataObj[1]+' '+dataObj[2]+' '+counter}],
+                    [{text:'Купить - '+dataObj[1]+' UZS'+' ('+counter +'шт.)',callback_data:'add'+' '+dataObj[1]+' '+dataObj[2]+' '+counter+' '+description}],
                     [{text:'В корзину',callback_data:'bin'}]
                 ]
             }
         }).catch((err)=>{console.log(err)})
-    })
+    
     
     }else if(query.data=='bin'){
 console.log('bin v korzinu')
 console.log('BINda>>'+JSON.stringify(cart))
-
-//cartById
             
-            //var description=dataObj.slice(4,dataObj.length).join(" ")
-            calculated_cost = cartByChatId[0].cost * cartByChatId[0].count
-            dataObj[2]=cartByChatId[indexOf].id
+            var description=dataObj.slice(4,dataObj.length).join(" ")
+            calculated_cost = cart[0].cost*cart[0].count
+            dataObj[2]=cart[indexOf].id
             
 //calculating total amount in cart
             
             var total_amount = 0    
-            for(var i in cartByChatId){
-                total_amount=total_amount + parseFloat(cartByChatId[i].cost) * cartByChatId[i].count
+            for(var i in cart){
+                total_amount=total_amount + parseFloat(cart[i].cost)*cart[i].count
             }
             //console.log('total_amount: '+total_amount)   
 
         fetch(`http://allouzb/product/img?id=${dataObj[2]}`).then(response => response.json())
         .then(data=>{
-            bot.sendMessage(query.message.chat.id,'Корзина:\n '+cartByChatId[0].cost+' UZS '+' x '+cartByChatId[0].count+' = '+calculated_cost+' UZS '+'\n\n'+'<a href="allouzb'+data.img+'">'+data.description+'</a>',{
+            bot.sendMessage(query.message.chat.id,'Корзина:\n '+cart[0].cost+' UZS '+' x '+cart[0].count+' = '+calculated_cost+' UZS '+'\n\n'+'<a href="allouzb'+data.img+'">'+data.description+'</a>',{
                 reply_markup:{
                     inline_keyboard: [
                         [{text:'❌',callback_data:'❌'},{text:'🔻',callback_data:'🔻'},{text:cart[indexOf].count+' шт.',callback_data:'c'},{text:'🔺',callback_data:'🔺'}],
-                        [{text:'◀️',callback_data:'◀️'},{text: (indexOf+1)+'/'+cartByChatId.length,callback_data:'nu'},{text:'▶️',callback_data:'▶️'}],
+                        [{text:'◀️',callback_data:'◀️'},{text: (indexOf+1)+'/'+cart.length,callback_data:'nu'},{text:'▶️',callback_data:'▶️'}],
                         [{text:'✅ Заказ на '+total_amount+' UZS Оформить?',callback_data:'formalize'}]
                     ]
                 },
@@ -329,40 +319,34 @@ console.log('BINda>>'+JSON.stringify(cart))
     
     }else if(query.data=='❌'){
         
-        console.log('indexOf initial '+indexOf)
         if(indexOf==0){
             //indexOf++;
         }else{
             indexOf--;
         }
+
+        dataObj[2]=cart[indexOf].id
+
+        removeItemFromCart(dataObj[2])
+
         
-
-        dataObj[2]=cartByChatId[indexOf].id
-        
-        console.log('id tovar to be delted >>'+cartByChatId[indexOf].id)
-        console.log('cartbychatid  '+JSON.stringify(cartByChatId))
-
-        removeItemFromCart(dataObj[2],query.message.chat.id)
-        cartByChatId = cart.filter(item =>item.chatId==query.message.chat.id)
-        console.log('cartbychatid d>>'+JSON.stringify(cartByChatId)) 
-
-        if(cartByChatId.length!=0){
-            calculated_cost = cartByChatId[indexOf].cost * cartByChatId[indexOf].count
+        if(cart.length!=0){
+            calculated_cost = cart[indexOf].cost*cart[indexOf].count
             var total_amount = 0    
             
-            for(var i in cartByChatId){
-                total_amount=total_amount + parseFloat(cartByChatId[i].cost)*cartByChatId[i].count
+            for(var i in cart){
+                total_amount=total_amount + parseFloat(cart[i].cost)*cart[i].count
             }
-        dataObj[2]=cartByChatId[indexOf].id
+
         fetch(`http://allouzb/product/img?id=${dataObj[2]}`).then(response => response.json())
             .then(data=>{
-            bot.editMessageText('Корзина:\n '+cartByChatId[indexOf].cost+' UZS '+' x '+cartByChatId[indexOf].count+' = '+calculated_cost+' UZS \n\n'+'<a href="allouzb'+data.img+'">'+data.description+'</a>',{
+            bot.editMessageText('Корзина:\n '+cart[indexOf].cost+' UZS '+' x '+cart[indexOf].count+' = '+calculated_cost+' UZS \n\n'+'<a href="allouzb'+data.img+'">'+data.description+'</a>',{
                 chat_id: query.message.chat.id,
                 message_id:query.message.message_id,
                 reply_markup:{
                     inline_keyboard:[
-                        [{text:'❌',callback_data:'❌'},{text:'🔻',callback_data:'🔻'},{text:cartByChatId[indexOf].count+' шт.',callback_data:'c'},{text:'🔺',callback_data:'🔺'}],
-                        [{text:'◀️',callback_data:'◀️'},{text: (indexOf+1)+'/'+cartByChatId.length,callback_data:'nu'},{text:'▶️',callback_data:'▶️'}],
+                        [{text:'❌',callback_data:'❌'},{text:'🔻',callback_data:'🔻'},{text:cart[indexOf].count+' шт.',callback_data:'c'},{text:'🔺',callback_data:'🔺'}],
+                        [{text:'◀️',callback_data:'◀️'},{text: (indexOf+1)+'/'+cart.length,callback_data:'nu'},{text:'▶️',callback_data:'▶️'}],
                         [{text:'✅ Заказ на '+total_amount+' UZS Оформить?',callback_data:'formalize'}]
                     ]
                 },
@@ -397,91 +381,91 @@ console.log('BINda>>'+JSON.stringify(cart))
             indexOf--;
             if(indexOf>=0){
 console.log('indexOf*** '+indexOf)
-                dataObj[2]=cartByChatId[indexOf].id
+                dataObj[2]=cart[indexOf].id
 console.log('chap<<'+dataObj[2])
-                calculated_cost = cartByChatId[indexOf].cost * cartByChatId[indexOf].count
-                //var description=dataObj.slice(4,dataObj.length).join(" ")
+                calculated_cost = cart[indexOf].cost*cart[indexOf].count
+                var description=dataObj.slice(4,dataObj.length).join(" ")
                 
                 var total_amount = 0    
-                for(var i in cartByChatId){
-                    total_amount=total_amount + parseFloat(cartByChatId[i].cost) * cartByChatId[i].count
+                for(var i in cart){
+                    total_amount=total_amount + parseFloat(cart[i].cost)*cart[i].count
                 }
 
         fetch(`http://allouzb/product/img?id=${dataObj[2]}`).then(response => response.json())
         .then(data=>{
-                bot.editMessageText('Корзина:\n '+cartByChatId[indexOf].cost+' UZS '+' x '+cartByChatId[indexOf].count+' = '+calculated_cost+' UZS \n\n'+'<a href="allouzb'+data.img+'">'+data.description+'</a>',{
+                bot.editMessageText('Корзина:\n '+cart[indexOf].cost+' UZS '+' x '+cart[indexOf].count+' = '+calculated_cost+' UZS \n\n'+'<a href="allouzb'+data.img+'">'+data.description+'</a>',{
                     chat_id: query.message.chat.id,
                     message_id:query.message.message_id,
                     reply_markup:{
                         inline_keyboard:[
-                            [{text:'❌',callback_data:'❌'},{text:'🔻',callback_data:'🔻'},{text:cartByChatId[indexOf].count+' шт.',callback_data:'c'},{text:'🔺',callback_data:'🔺'}],
-                            [{text:'◀️',callback_data:'◀️'},{text: (indexOf+1)+'/'+cartByChatId.length,callback_data:'nu'},{text:'▶️',callback_data:'▶️'}],
+                            [{text:'❌',callback_data:'❌'},{text:'🔻',callback_data:'🔻'},{text:cart[indexOf].count+' шт.',callback_data:'c'},{text:'🔺',callback_data:'🔺'}],
+                            [{text:'◀️',callback_data:'◀️'},{text: (indexOf+1)+'/'+cart.length,callback_data:'nu'},{text:'▶️',callback_data:'▶️'}],
                             [{text:'✅ Заказ на '+total_amount+' UZS Оформить?',callback_data:'formalize'}]
                         ]
                     },
                     parse_mode:'HTML'
                 })
         })
-            }else{console.log('no more left'+indexOf);indexOf++;indexOf=0;}
+            }else{console.log('no more left'+indexOf);indexOf++;}
             
 
     }else if(query.data=='▶️'){
 
             indexOf++;
-            if(indexOf<=(cartByChatId.length-1)){
+            if(indexOf<=(cart.length-1)){
 
-                dataObj[2]=cartByChatId[indexOf].id
+                dataObj[2]=cart[indexOf].id
 console.log('ong>>'+dataObj[2])
-                calculated_cost = cartByChatId[indexOf].cost * cartByChatId[indexOf].count
-                //var description=dataObj.slice(4,dataObj.length).join(" ")
+                calculated_cost = cart[indexOf].cost*cart[indexOf].count
+                var description=dataObj.slice(4,dataObj.length).join(" ")
                 
                 var total_amount = 0    
-                for(var i in cartByChatId){
-                    total_amount=total_amount + parseFloat(cartByChatId[i].cost)*cartByChatId[i].count
+                for(var i in cart){
+                    total_amount=total_amount + parseFloat(cart[i].cost)*cart[i].count
                 }
                 
                 
             fetch(`http://allouzb/product/img?id=${dataObj[2]}`).then(response => response.json())
                 .then(data=>{ 
-                bot.editMessageText('Корзина:\n '+cartByChatId[indexOf].cost+' UZS '+' x '+cartByChatId[indexOf].count+' = '+calculated_cost+' UZS \n\n'+'<a href="allouzb'+data.img+'">'+data.description+'</a>',{
+                bot.editMessageText('Корзина:\n '+cart[indexOf].cost+' UZS '+' x '+cart[indexOf].count+' = '+calculated_cost+' UZS \n\n'+'<a href="allouzb'+data.img+'">'+data.description+'</a>',{
                     chat_id: query.message.chat.id,
                     message_id:query.message.message_id,
                     reply_markup:{
                         inline_keyboard:[
-                            [{text:'❌',callback_data:'❌'},{text:'🔻',callback_data:'🔻'},{text:cartByChatId[indexOf].count+' шт.',callback_data:'c'},{text:'🔺',callback_data:'🔺'}],
-                            [{text:'◀️',callback_data:'◀️'},{text: (indexOf+1)+'/'+cartByChatId.length,callback_data:'nu'},{text:'▶️',callback_data:'▶️'}],
+                            [{text:'❌',callback_data:'❌'},{text:'🔻',callback_data:'🔻'},{text:cart[indexOf].count+' шт.',callback_data:'c'},{text:'🔺',callback_data:'🔺'}],
+                            [{text:'◀️',callback_data:'◀️'},{text: (indexOf+1)+'/'+cart.length,callback_data:'nu'},{text:'▶️',callback_data:'▶️'}],
                             [{text:'✅ Заказ на '+total_amount+' UZS Оформить?',callback_data:'formalize'}]
                         ]
                     },
                     parse_mode:'HTML'
                 })
             })
-            }else{console.log('no more right'+indexOf);indexOf--;indexOf=cartByChatId.length-1;}
+            }else{console.log('no more right'+indexOf);indexOf--;}
             
     
     }else if(query.data=='🔻'){
 console.log('indexOf*** '+indexOf)
-console.log('down cart '+JSON.stringify(cartByChatId))
+console.log('down cart '+JSON.stringify(cart))
             
-            if(cartByChatId[indexOf].count!=1){
-                dataObj[2]=cartByChatId[indexOf].id
-                decrementItemInCart(dataObj[2],query.message.chat.id)
-                calculated_cost = cartByChatId[indexOf].cost*cartByChatId[indexOf].count
+            if(cart[indexOf].count!=1){
+                dataObj[2]=cart[indexOf].id
+                decrementItemInCart(dataObj[2])
+                calculated_cost = cart[indexOf].cost*cart[indexOf].count
 
                 var total_amount = 0    
-                for(var i in cartByChatId){
-                    total_amount=total_amount + parseFloat(cartByChatId[i].cost)*cartByChatId[i].count
+                for(var i in cart){
+                    total_amount=total_amount + parseFloat(cart[i].cost)*cart[i].count
                 }
 
             fetch(`http://allouzb/product/img?id=${dataObj[2]}`).then(response => response.json())
                 .then(data=>{ 
-                bot.editMessageText('Корзина:\n '+cartByChatId[indexOf].cost+' UZS '+' x '+cartByChatId[indexOf].count+' = '+calculated_cost+' UZS \n\n'+'<a href="allouzb'+data.img+'">'+data.description+'</a>',{
+                bot.editMessageText('Корзина:\n '+cart[indexOf].cost+' UZS '+' x '+cart[indexOf].count+' = '+calculated_cost+' UZS \n\n'+'<a href="allouzb'+data.img+'">'+data.description+'</a>',{
                     chat_id: query.message.chat.id,
                     message_id:query.message.message_id,
                     reply_markup:{
                         inline_keyboard:[
-                            [{text:'❌',callback_data:'❌'},{text:'🔻',callback_data:'🔻'},{text:cartByChatId[indexOf].count+' шт.',callback_data:'c'},{text:'🔺',callback_data:'🔺'}],
-                            [{text:'◀️',callback_data:'◀️'},{text: (indexOf+1)+'/'+cartByChatId.length,callback_data:'nu'},{text:'▶️',callback_data:'▶️'}],
+                            [{text:'❌',callback_data:'❌'},{text:'🔻',callback_data:'🔻'},{text:cart[indexOf].count+' шт.',callback_data:'c'},{text:'🔺',callback_data:'🔺'}],
+                            [{text:'◀️',callback_data:'◀️'},{text: (indexOf+1)+'/'+cart.length,callback_data:'nu'},{text:'▶️',callback_data:'▶️'}],
                             [{text:'✅ Заказ на '+total_amount+' UZS Оформить?',callback_data:'formalize'}]
                         ]
                     },
@@ -495,29 +479,29 @@ console.log('down cart '+JSON.stringify(cartByChatId))
             
     }else if(query.data == '🔺'){
 console.log('indexOf**** '+indexOf)  //cart digi orni
-console.log('cartByChatId '+JSON.stringify(cartByChatId))
+console.log('cart '+JSON.stringify(cart))
 console.log('dataObj[2] '+dataObj[2]) //id of pruduct
             
-            dataObj[2]=cartByChatId[indexOf].id
-            incrementItemInCart(dataObj[2],query.message.chat.id)
+            dataObj[2]=cart[indexOf].id
+            incrementItemInCart(dataObj[2])
 
-            calculated_cost = cartByChatId[indexOf].cost*cartByChatId[indexOf].count
+            calculated_cost = cart[indexOf].cost*cart[indexOf].count
 
             var total_amount = 0    
-            for(var i in cartByChatId){
-                total_amount=total_amount + parseFloat(cartByChatId[i].cost)*cartByChatId[i].count
+            for(var i in cart){
+                total_amount=total_amount + parseFloat(cart[i].cost)*cart[i].count
             }
             
 console.log('Qara buyoga>>>>>>>'+calculated_cost)
         fetch(`http://allouzb/product/img?id=${dataObj[2]}`).then(response => response.json())
             .then(data=>{ 
-            bot.editMessageText('Корзина:\n '+cartByChatId[indexOf].cost+' UZS '+' x '+cartByChatId[indexOf].count+' = '+calculated_cost+' UZS \n\n'+'<a href="allouzb'+data.img+'">'+data.description+'</a>',{
+            bot.editMessageText('Корзина:\n '+cart[indexOf].cost+' UZS '+' x '+cart[indexOf].count+' = '+calculated_cost+' UZS \n\n'+'<a href="allouzb'+data.img+'">'+data.description+'</a>',{
                 chat_id: query.message.chat.id,
                 message_id:query.message.message_id,
                 reply_markup:{
                     inline_keyboard:[
-                        [{text:'❌',callback_data:'❌'},{text:'🔻',callback_data:'🔻'},{text:cartByChatId[indexOf].count+' шт.',callback_data:'c'},{text:'🔺',callback_data:'🔺'}],
-                        [{text:'◀️',callback_data:'◀️'},{text: (indexOf+1)+'/'+cartByChatId.length,callback_data:'nu'},{text:'▶️',callback_data:'▶️'}],
+                        [{text:'❌',callback_data:'❌'},{text:'🔻',callback_data:'🔻'},{text:cart[indexOf].count+' шт.',callback_data:'c'},{text:'🔺',callback_data:'🔺'}],
+                        [{text:'◀️',callback_data:'◀️'},{text: (indexOf+1)+'/'+cart.length,callback_data:'nu'},{text:'▶️',callback_data:'▶️'}],
                         [{text:'✅ Заказ на '+total_amount+' UZS Оформить?',callback_data:'formalize'}]
                     ]
                 },
@@ -582,7 +566,7 @@ console.log('Qara buyoga>>>>>>>'+calculated_cost)
                             caption:good.description,
                             reply_markup:{
                                 inline_keyboard:[
-                                    [{text:'Купить - '+good.cost+' UZS' ,callback_data:'add'+' '+good.cost+' '+good.id+' '+counter}]
+                                    [{text:'Купить - '+good.cost+' UZS' ,callback_data:'add'+' '+good.cost+' '+good.id+' '+counter+' '+good.description}]
                                 ]
                             }
                         }).then(()=>{}).catch((err)=>{console.log(err)})
@@ -613,46 +597,44 @@ console.log('Qara buyoga>>>>>>>'+calculated_cost)
 
 //functions
         var cart = []
-        var cartByChatId=[]
-        var Item = function(id,cost,count,description,chatId){
+        var Item = function(id,cost,count,description){
             this.id = id
             this.cost = cost
             this.count = count
             this.description = description
-            this.chatId = chatId
         }
 
-        function addItemToCart(id,cost,count,description,chatId){
+        function addItemToCart(id,cost,count,description){
             for(var i in cart){
-                if(cart[i].id === id && cart[i].chatId === chatId){
+                if(cart[i].id === id){
                     cart[i].count ++;
                     return
                 }
             }
-            var item = new Item(id,cost,count,description, chatId);
+            var item = new Item(id,cost,count,description);
             cart.push(item);
         }
 
-
-        function removeItemFromCart(id, chatId){
+        
+        function removeItemFromCart(id){
             for(var i in cart){
-                if(cart[i].id===id && cart[i].chatId === chatId){
+                if(cart[i].id===id){
                     cart.splice(i,1);
                     break;
                 }
             }
         }
-        function incrementItemInCart(id, chatId){
+        function incrementItemInCart(id){
             for(var i in cart){
-                if(cart[i].id===id && cart[i].chatId === chatId){
+                if(cart[i].id===id){
                     cart[i].count++;
                     break
                 }
             }
         }
-        function decrementItemInCart(id, chatId){
+        function decrementItemInCart(id){
             for(var i in cart){
-                if(cart[i].id===id && cart[i].chatId === chatId){
+                if(cart[i].id===id){
                     if(cart[i].count>1){
                         cart[i].count--;
                     }else{

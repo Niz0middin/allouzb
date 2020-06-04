@@ -1,27 +1,27 @@
 module.exports = {
     home:{
-        catalogs:'Каталог',
-        bin:'Корзина',
-        orders:'Заказы',
-        news:'Новости',
-        help:'Помощь'
+        catalogs:'🛍 Каталог',
+        bin:'🛒 Корзина',
+        orders:'📬 Заказы',
+        news:'📢 Новости',
+        help:'⁉️ Помощь'
     },
     help:{
-        call:'Позвонить',
-        write:'связаться с админом'
+        call:'📞 Позвонить',
+        write:'👨🏻‍💻 Связаться с Админом'
     },
     cancel:{
-        cancel:'Отмена'
+        cancel:'❌ Отмена'
     },
     back:{
-        backward:'Назад'
+        backward:'◀️ Назад'
     },
     more:{
-        more:'Ещё'
+        more:'🔄 Ещё'
     },
     exit:{
         mcatalogue:'🗂 В начало каталога',
         exit:'◀️ Назад в главны меню'
-    },
+    }
 
 }

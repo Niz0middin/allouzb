@@ -3,7 +3,7 @@ module.exports={
     home:[
         [kb.home.catalogs, kb.home.bin],
         [kb.home.orders, kb.home.news],
-        [ kb.home.help]
+        [kb.home.help]
     ],
     help:[
         [kb.help.call, kb.help.write],
