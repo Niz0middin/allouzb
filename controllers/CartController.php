@@ -189,4 +189,27 @@ class CartController extends Controller
         return $message;
     }
 
+
+    public function actionGetOrder($key)
+    {
+        Yii::$app->response->format = Response::FORMAT_JSON;
+        $order = Orders::findOne(['order_key' => $key]);
+        if (!empty($order)){
+            $response = $order;
+        }
+        else $response = "There is no order with this key";
+        return $response;
+    }
+
+    public function actionGetClientOrder($chat_id)
+    {
+        Yii::$app->response->format = Response::FORMAT_JSON;
+        $order = Orders::find()->where(['client_id' => $chat_id, 'status' => 1])->all();
+        if (!empty($order)){
+            $response = $order;
+        }
+        else $response = "There is no order of this user";
+        return $response;
+    }
+
 }
