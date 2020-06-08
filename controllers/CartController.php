@@ -168,7 +168,7 @@ class CartController extends Controller
         $order->tel = $tel;
         $order->status = 1;
         $order->save();
-        $error = $order->getErrors();
+        $error['order'][] = $order->getErrors();
 
         foreach ($carts as $cart) {
             $model = new Cart();
@@ -177,9 +177,16 @@ class CartController extends Controller
             $model->cost = $cart['cost'];
             $model->count = $cart['count'];
             $model->save();
+            $error['cart'][] = $model->getErrors();
         }
 
-        return $error;
+        if (empty($error)){
+            $message = 'success';
+        }else{
+            $message = $error;
+        }
+
+        return $message;
     }
 
 }
