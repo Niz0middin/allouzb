@@ -4,15 +4,25 @@ const helper = require('./helper')
 const keyboard = require('./keyboard')
 const kb = require('./keyboard-buttons')
 //const ikb = require('./inline-keyboard')
-const fs = require('fs')
+//const fs = require('fs')
 const fetch = require('node-fetch')  //installed npm node-fetch for api
+//const mysql = require('mysql')
 
 helper.logStart()
 const bot = new TelegramBot(config.TOKEN,{
     polling: true
 })
 
-var indexOf=0, lock=0, id
+var indexOf=0, lock=0, address_lock=0, finish=0, id
+var finalCartByChatId=[]
+// Listen on the 'polling_error' event
+bot.on('polling_error', (error) => {
+	var time = new Date();
+	console.log("TIME:", time);
+	console.log("CODE:", error.code);  // => 'EFATAL'
+	console.log("MSG:", error.message);
+	console.log("STACK:", error.stack);
+});
 
 bot.onText(/\/start/,msg=>{
     const text = `Добро пожаловать на наш магазин ${msg.from.first_name}\nВыберетье команду:`
@@ -54,6 +64,7 @@ bot.on('message', msg=>{
                 
             })
             break
+        
         case kb.home.bin:
             console.log('BINda>>'+JSON.stringify(cartByChatId))
             
@@ -74,7 +85,7 @@ bot.on('message', msg=>{
 
                 fetch(`http://allouzb/product/img?id=${dataObj[2]}`).then(response => response.json())
                 .then(data=>{
-                    bot.sendMessage(chatId,'Корзина:\n '+cartByChatId[0].cost+' UZS '+' x '+cartByChatId[0].count+' = '+calculated_cost+' UZS '+'\n\n'+'<a href="allouzb'+data.img+'">'+data.description+'</a>',{
+                    bot.sendMessage(chatId,'🛍 Корзина:\n '+cartByChatId[0].cost+' UZS '+' x '+cartByChatId[0].count+' = '+calculated_cost+' UZS '+'\n\n'+'<a href="allouzb'+data.img+'">'+data.description+'</a>',{
                         reply_markup:{
                             inline_keyboard: [
                                 [{text:'❌',callback_data:'❌'},{text:'🔻',callback_data:'🔻'},{text:cartByChatId[indexOf].count+' шт.',callback_data:'c'},{text:'🔺',callback_data:'🔺'}],
@@ -87,6 +98,50 @@ bot.on('message', msg=>{
 
                 })
             }
+            break
+//bitta teppadigi home.bin bilan birxil
+        case '◀️ Назад в корзину':
+            console.log('BINda>>'+JSON.stringify(cartByChatId))
+            
+            if(cartByChatId.length == 0){
+                console.log('cart null')
+                bot.sendMessage(chatId,'В корзине пусто 🛒\n Посмотрите Каталог, там много интересного')
+
+            }else{
+                indexOf=0;
+                calculated_cost = cartByChatId[0].cost*cartByChatId[0].count
+                dataObj[2]=cartByChatId[indexOf].id
+            
+                var total_amount = 0    
+                for(var i in cartByChatId){
+                    total_amount=total_amount + parseFloat(cartByChatId[i].cost)*cartByChatId[i].count
+                }
+            //console.log('total_amount: '+total_amount)   
+
+                fetch(`http://allouzb/product/img?id=${dataObj[2]}`).then(response => response.json())
+                .then(data=>{
+                    bot.sendMessage(chatId,'🛍 Корзина:\n '+cartByChatId[0].cost+' UZS '+' x '+cartByChatId[0].count+' = '+calculated_cost+' UZS '+'\n\n'+'<a href="allouzb'+data.img+'">'+data.description+'</a>',{
+                        reply_markup:{
+                            inline_keyboard: [
+                                [{text:'❌',callback_data:'❌'},{text:'🔻',callback_data:'🔻'},{text:cartByChatId[indexOf].count+' шт.',callback_data:'c'},{text:'🔺',callback_data:'🔺'}],
+                                [{text:'◀️',callback_data:'◀️'},{text: (indexOf+1)+'/'+cartByChatId.length,callback_data:'nu'},{text:'▶️',callback_data:'▶️'}],
+                                [{text:'✅ Заказ на '+total_amount+' UZS Оформить?',callback_data:'formalize'}]
+                            ]
+                        },
+                        parse_mode:'HTML'
+                    })
+
+                })
+            }
+            break
+        
+        case '🚫 Отменить Заказ':
+            bot.sendMessage(chatId,'❌ Ваш Заказ был отменен.\n',{
+                reply_markup:{
+                    keyboard: keyboard.home,
+                    resize_keyboard: true 
+                }
+            })
             break
         case kb.home.orders:
             break
@@ -112,7 +167,7 @@ bot.on('message', msg=>{
                 fetch(`http://allouzb/news/get?id=${id}`).then(response => response.json())
                 .then(data=>{
                     if(data==null){
-                        bot.sendMessage(chatId,'⚠️Других новостей пока нет🗞')
+                        bot.sendMessage(chatId,'⚠️ Других новостей пока нет! 🗞')
                     }else{
 
                     id = data.id
@@ -146,7 +201,7 @@ bot.on('message', msg=>{
         case kb.help.write:
             lock=1
             
-            bot.sendMessage(chatId,'Напишите сообщение',{
+            bot.sendMessage(chatId,'⚠️ Предупреждение!!! \n\nВы можете оставить отзыв. Если у вас нет имени пользователя (Username), то невозможно связаться с вами. В этом случае, пожалуйста, укажите ваше имя пользователя (Username) или номер телефона в вашем сообщение. Спасибо за понимание. \n\nОставьте свой отзыв в службу поддержки ✍️👇🏼',{
                 reply_markup:{
                     keyboard:keyboard.cancel,
                     resize_keyboard:true
@@ -206,45 +261,129 @@ bot.on('message', msg=>{
             })
             break
 
-        case '🚚Доставить/Yetqazib\nberish':
+        case '🚚📦 Доставить/Yetqazib\nberish':
             var total_amount = 0    
             
             for(var i in cartByChatId){
                 total_amount=total_amount + parseFloat(cartByChatId[i].cost)*cartByChatId[i].count
             }
 
-            console.log('cartByChatId>> '+JSON.stringify(cartByChatId))
+          /*console.log('cartByChatId>> '+JSON.stringify(cartByChatId))
+            //console.log('cart bychatid>>> '+JSON.stringify(cartByChatId))
             console.log('total_amount>> '+total_amount)
             console.log('chatid>> '+msg.from.id)
             console.log('firstname>> '+msg.from.first_name)
             console.log('lastname>> '+msg.from.last_name)
-            console.log('username>> '+msg.from.username)
+            console.log('username>> '+msg.from.username)*/
+            
+            //PUSH chatid
+            finalCartByChatId = cartByChatId
+            
+            
+            bot.sendMessage(chatId,'☎️ Поделитесь своим номером телефона:',{
+                reply_markup:{
+                    one_time_keyboard:true,
+                    resize_keyboard:true,
+                    keyboard:[
+                        [{text:'☎️ Отправить мой номер', request_contact: true}],
+                        ['◀️ Назад в корзину'],
+                        ['🚫 Отменить Заказ']
+                    ]
+                }
+            })
+             .then(()=>{
+                bot.once("contact",(msg)=>{
+                    
+                    //console.log(JSON.stringify(msg))
+                    console.log('name by contact>> '+msg.contact.first_name+'\nphone number>> '+msg.contact.phone_number) 
+                    
+                    //PUSH phonenumber
+                    finalCartByChatId.push({phonenumber:`${msg.contact.phone_number}`,chatId:`${msg.chat.id}`})
+                    address_lock=1
+                    bot.sendMessage(msg.chat.id,'📍 Пожалуйста, отправьте ваше местоположение: ',{
+                        reply_markup:{
+                            one_time_keyboard:true,
+                            resize_keyboard:true,
+                            keyboard:[
+                                ['◀️ Назад в корзину'],
+                                ['🚫 Отменить Заказ']
+                            ]
+                        }
+                    })
+                })
+            })
+
+
             break
 
 
 
 
             default:{
+            //admin ga message jonatiw
                 console.log(lock)
                 if(lock==1){
                    //bazaga shu msg.text otziv ga yoziladi
-                    console.log(msg.text+'this will go to DB')
-                    console.log('chatid '+msg.from.id)
-                    console.log('firstname '+msg.from.first_name)
+                    //console.log(msg.text+'this will go to DB')
+                    //console.log('chatid '+msg.from.id)
+                    //console.log('firstname '+msg.from.first_name)
                    //tugadi bazaga yozish
-                    bot.sendMessage(chatId,'Спасибо за ваш отзыв!',{
+                    bot.sendMessage(chatId,'Спасибо за ваш отзыв! Админ свяжется с вами в ближайшее время.',{
                         reply_markup:{
                             keyboard:keyboard.back,
                             resize_keyboard:true
                         }
                     }).then(()=>{
-                        bot.sendMessage(2975459,msg.from.first_name+' send you this message:\n'+msg.text)
+                        bot.sendMessage(2975459,'@'+msg.from.username + ' отправил(-а) отзыв 👇🏼:\n\n'+msg.text)
                     })
+                    lock=0
                 }
-                lock=0 //buyoda hold otzivni ajratish uchun kk
                 
-                
+            //end adminga message jonatiw  
+            
+            
+            if(finish==1){
+                finalCartByChatId.push({time:`${msg.text}`,chatId:`${msg.chat.id}`})
+                console.log('cart>> '+JSON.stringify(finalCartByChatId))
+                var send_finalCartByChatId = finalCartByChatId.filter(item =>item.chatId==msg.chat.id)
+                //console.log('first_name'+msg.from.first_name)
+                //console.log('second_name'+msg.from.last_name)
+                //console.log('username '+msg.from.username)
+                bot.sendMessage(chatId,'Your order has been established!!!\n'+JSON.stringify(send_finalCartByChatId,null,4))
+
+                finish=0
             }
+
+
+            //geo location orniga address jonatiw
+                if(address_lock==1){//finish=1
+                    console.log(JSON.stringify(msg,null,4))
+                    
+                    //console.log(msg.location.latitude+','+msg.location.latitude+' <<'+' <<bu address boliwi kk')
+                    if(msg.location!=undefined){
+                        finalCartByChatId.push({location:`https://google.com/maps/?q=${msg.location.latitude},${msg.location.longitude}`,chatId:`${msg.chat.id}`})
+                    }else{
+                        //PUSH location text
+                        finalCartByChatId.push({location:`${msg.text}`,chatId:`${msg.chat.id}`})
+                    }
+                    console.log('last bychi>>>>> '+JSON.stringify(finalCartByChatId,null,4))
+                    bot.sendMessage(chatId,'🕐 В какое время и когда вы хотите получить?',{
+                        reply_markup:{
+                            resize_keyboard: true,
+                            one_time_keyboard:true,
+                            keyboard:[
+                                ['🚫 Отменить Заказ']
+                            ]
+                        }
+                    })
+                    address_lock=0
+                    finish=1
+                }
+             //end of geo location jonatiw
+
+            }
+
+            
         
     }
 })
@@ -288,8 +427,8 @@ console.log('cart added'+JSON.stringify(cart))
             message_id: query.message.message_id,
             reply_markup:{
                 inline_keyboard:[
-                    [{text:'Купить - '+dataObj[1]+' UZS'+' ('+counter +'шт.)',callback_data:'add'+' '+dataObj[1]+' '+dataObj[2]+' '+counter}],
-                    [{text:'В корзину',callback_data:'bin'}]
+                    [{text:'🛍 Купить - '+dataObj[1]+' UZS'+' ('+counter +'шт.)',callback_data:'add'+' '+dataObj[1]+' '+dataObj[2]+' '+counter}],
+                    [{text:'🛒 В корзину',callback_data:'bin'}]
                 ]
             }
         }).catch((err)=>{console.log(err)})
@@ -336,10 +475,10 @@ console.log('BINda>>'+JSON.stringify(cart))
             indexOf--;
         }
         
-
+        
         dataObj[2]=cartByChatId[indexOf].id
         
-        console.log('id tovar to be delted >>'+cartByChatId[indexOf].id)
+        console.log('id tovar to be delted >>'+dataObj[2])
         console.log('cartbychatid  '+JSON.stringify(cartByChatId))
 
         removeItemFromCart(dataObj[2],query.message.chat.id)
@@ -536,8 +675,8 @@ console.log('Qara buyoga>>>>>>>'+calculated_cost)
         bot.sendMessage(query.message.chat.id,'Укажитье вариант доставки:',{
             reply_markup:{
                 keyboard:[
-                    ['🚚Доставить/Yetqazib\nberish','Отмена'],
-                    ['◀️Назад в корзину']
+                    ['🚚📦 Доставить/Yetqazib\nberish'],
+                    ['◀️ Назад в корзину','🚫 Отменить Заказ']
                 ],
                 resize_keyboard:true
             }
@@ -582,7 +721,7 @@ console.log('Qara buyoga>>>>>>>'+calculated_cost)
                             caption:good.description,
                             reply_markup:{
                                 inline_keyboard:[
-                                    [{text:'Купить - '+good.cost+' UZS' ,callback_data:'add'+' '+good.cost+' '+good.id+' '+counter}]
+                                    [{text:'🛍 Купить - '+good.cost+' UZS' ,callback_data:'add'+' '+good.cost+' '+good.id+' '+counter}]
                                 ]
                             }
                         }).then(()=>{}).catch((err)=>{console.log(err)})

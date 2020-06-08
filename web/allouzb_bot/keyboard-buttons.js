@@ -20,7 +20,7 @@ module.exports = {
         more:'🔄 Ещё'
     },
     exit:{
-        mcatalogue:'🗂 В начало каталога',
+        mcatalogue:'📁 В начало каталога',
         exit:'◀️ Назад в главны меню'
     }
 
