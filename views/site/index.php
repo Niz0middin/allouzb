@@ -15,14 +15,20 @@ $this->title = 'Allouzb';
     <div class="jumbotron">
         <h1>Allouzb</h1>
         <div class="row">
-            <div class="col-md-3 col-md-offset-2">
+            <div class="col-md-4">
                 <p><a class="btn btn-lg btn-success" href="/category">Категория</a></p>
             </div>
-            <div class="col-md-3">
+            <div class="col-md-4">
                 <p><a class="btn btn-lg btn-success" href="/product">Продукты</a></p>
             </div>
-            <div class="col-md-2">
+            <div class="col-md-4">
                 <p><a class="btn btn-lg btn-success" href="/news">Новости</a></p>
+            </div>
+            <div class="col-md-5">
+                <p><a class="btn btn-lg btn-success" href="/cart">Cart</a></p>
+            </div>
+            <div class="col-md-5">
+                <p><a class="btn btn-lg btn-success" href="/orders">Orders</a></p>
             </div>
         </div>
     </div>

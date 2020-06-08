@@ -8,6 +8,10 @@ use Yii;
  * This is the model class for table "client".
  *
  * @property int $id
+ * @property string|null $name
+ * @property string|null $tel
+ *
+ * @property Orders[] $orders
  */
 class Client extends \yii\db\ActiveRecord
 {
@@ -27,6 +31,8 @@ class Client extends \yii\db\ActiveRecord
         return [
             [['id'], 'required'],
             [['id'], 'integer'],
+            [['name'], 'string', 'max' => 255],
+            [['tel'], 'string', 'max' => 50],
             [['id'], 'unique'],
         ];
     }
@@ -38,6 +44,18 @@ class Client extends \yii\db\ActiveRecord
     {
         return [
             'id' => 'ID',
+            'name' => 'Name',
+            'tel' => 'Tel',
         ];
+    }
+
+    /**
+     * Gets query for [[Orders]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getOrders()
+    {
+        return $this->hasMany(Orders::className(), ['client_id' => 'id']);
     }
 }
