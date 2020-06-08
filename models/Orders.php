@@ -14,6 +14,8 @@ use yii\behaviors\TimestampBehavior;
  * @property float $cost
  * @property int $count
  * @property string $location
+ * @property string $time
+ * @property string $tel
  * @property int $status
  * @property int|null $created_at
  * @property int|null $updated_at
@@ -48,7 +50,7 @@ class Orders extends \yii\db\ActiveRecord
             [['order_key', 'client_id', 'cost', 'count', 'location', 'status'], 'required'],
             [['client_id', 'count', 'status', 'created_at', 'updated_at'], 'integer'],
             [['cost'], 'number'],
-            [['order_key'], 'string', 'max' => 50],
+            [['order_key', 'time', 'tel'], 'string', 'max' => 50],
             [['location'], 'string', 'max' => 100],
             [['client_id'], 'exist', 'skipOnError' => true, 'targetClass' => Client::className(), 'targetAttribute' => ['client_id' => 'id']],
         ];
@@ -66,6 +68,8 @@ class Orders extends \yii\db\ActiveRecord
             'cost' => 'Cost',
             'count' => 'Count',
             'location' => 'Location',
+            'time' => 'Time',
+            'tel' => 'Telephone',
             'status' => 'Status',
             'created_at' => 'Created At',
             'updated_at' => 'Updated At',
