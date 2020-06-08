@@ -135,21 +135,21 @@ class CartController extends Controller
         $carts = [];
         $tel = $chat_id = $time = $location = null;
         $total_count = $total_cost = 0;
-        $requests = \Yii::$app->request->post();
+        $requests = Yii::$app->request->post();
 
         foreach ($requests as $request){
             if (isset($request['id'])){
                 $carts[] = $request;
             }
-            if (isset($request[0]['phonenumber'])){
-                $tel = $request[0]['phonenumber'];
-                $chat_id = $request[0]['chatId'];
+            if (isset($request['phonenumber'])){
+                $tel = $request['phonenumber'];
+                $chat_id = $request['chatId'];
             }
-            if (isset($request[0]['location'])){
-                $location = $request[0]['location'];
+            if (isset($request['location'])){
+                $location = $request['location'];
             }
-            if (isset($request[0]['time'])){
-                $time = $request[0]['time'];
+            if (isset($request['time'])){
+                $time = $request['time'];
             }
         }
 
@@ -180,7 +180,7 @@ class CartController extends Controller
             $error['cart'][] = $model->getErrors();
         }
 
-        if (empty($error)){
+        if (empty($error['order'] && empty($error['cart']))){
             $message = 'success';
         }else{
             $message = $error;
