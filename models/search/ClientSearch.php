@@ -4,12 +4,12 @@ namespace app\models\search;
 
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
-use app\models\Cart;
+use app\models\Client;
 
 /**
- * CartSearch represents the model behind the search form of `app\models\Cart`.
+ * ClientSearch represents the model behind the search form of `app\models\Client`.
  */
-class CartSearch extends Cart
+class ClientSearch extends Client
 {
     /**
      * {@inheritdoc}
@@ -17,9 +17,8 @@ class CartSearch extends Cart
     public function rules()
     {
         return [
-            [['id', 'product_id', 'order_id', 'count'], 'integer'],
-            [['cost'], 'number'],
-            [['created_at', 'updated_at'], 'safe'],
+            [['id'], 'integer'],
+            [['name', 'tel'], 'safe'],
         ];
     }
 
@@ -41,7 +40,7 @@ class CartSearch extends Cart
      */
     public function search($params)
     {
-        $query = Cart::find();
+        $query = Client::find();
 
         // add conditions that should always apply here
 
@@ -60,17 +59,10 @@ class CartSearch extends Cart
         // grid filtering conditions
         $query->andFilterWhere([
             'id' => $this->id,
-            'product_id' => $this->product_id,
-            'order_id' => $this->order_id,
-            'cost' => $this->cost,
-            'count' => $this->count,
-//            'created_at' => $this->created_at,
-//            'updated_at' => $this->updated_at,
         ]);
 
-        if(!empty($this->created_at)){
-            $query->andFilterWhere(['between', 'created_at', strtotime($this->created_at),strtotime($this->created_at)+86399]);
-        }
+        $query->andFilterWhere(['like', 'name', $this->name])
+            ->andFilterWhere(['like', 'tel', $this->tel]);
 
         return $dataProvider;
     }

@@ -1,5 +1,6 @@
 <?php
 
+use kartik\date\DatePicker;
 use yii\grid\ActionColumn;
 use yii\helpers\Html;
 use yii\grid\GridView;
@@ -31,8 +32,25 @@ $this->params['breadcrumbs'][] = $this->title;
             'order.order_key',
             'cost',
             'count',
-            'created_at',
-            'updated_at',
+            [
+                'attribute' => 'created_at',
+                'value' => function ($model) {
+                    return date('d.m.Y H:i', $model->created_at);
+                },
+                'filter' => DatePicker::widget([
+                    'model' => $searchModel,
+                    'attribute' => 'created_at',
+                    'options' =>[
+                        'readonly'=>'true'
+                    ],
+                    'pluginOptions' => [
+                        'autoclose' => true,
+                        'format' => 'yyyy-mm-dd',
+                        'todayHighlight' => true
+                    ]
+                ])
+            ],
+//            'updated_at',
 
             ['class' => ActionColumn::className(),'template'=>'{view} {delete}' ]
         ],
