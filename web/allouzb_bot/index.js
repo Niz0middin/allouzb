@@ -14,7 +14,7 @@ const bot = new TelegramBot(config.TOKEN,{
 })
 
 var indexOf=0, lock=0, address_lock=0, finish=0, id
-var finalCartByChatId=[]
+var finalCartByChatId=[], add_info=[]
 // Listen on the 'polling_error' event
 bot.on('polling_error', (error) => {
 	var time = new Date();
@@ -213,6 +213,7 @@ bot.on('message', msg=>{
             
         //knopka nazad
         case kb.cancel.cancel:
+            lock=0
             if(msg.text.toLowerCase=='отмена')
             {
                 bot.deleteMessage(chatId,messageId2)
@@ -298,6 +299,7 @@ bot.on('message', msg=>{
                     console.log('name by contact>> '+msg.contact.first_name+'\nphone number>> '+msg.contact.phone_number) 
                     
                     //PUSH phonenumber
+                    //add_info.push([{phonenumber:`${msg.contact.phone_number}`,chatId:`${msg.chat.id}`}])
                     finalCartByChatId.push({phonenumber:`${msg.contact.phone_number}`,chatId:`${msg.chat.id}`})
                     address_lock=1
                     bot.sendMessage(msg.chat.id,'📍 Пожалуйста, отправьте ваше местоположение: ',{
@@ -343,14 +345,21 @@ bot.on('message', msg=>{
             
             
             if(finish==1){
+                //add_info.push([{time:`${msg.text}`,chatId:`${msg.chat.id}`}])
                 finalCartByChatId.push({time:`${msg.text}`,chatId:`${msg.chat.id}`})
                 console.log('cart>> '+JSON.stringify(finalCartByChatId))
                 var send_finalCartByChatId = finalCartByChatId.filter(item =>item.chatId==msg.chat.id)
+                
+                //var l_add_info = add_info.filter(item=>item[0].chatId==msg.chat.id)
+                //send_finalCartByChatId.push(l_add_info)
                 //console.log('first_name'+msg.from.first_name)
                 //console.log('second_name'+msg.from.last_name)
                 //console.log('username '+msg.from.username)
                 bot.sendMessage(chatId,'Your order has been established!!!\n'+JSON.stringify(send_finalCartByChatId,null,4))
-
+                /*.then(()=>{
+                    add_info.splice([1].chatId==msg.chat.id,3)
+                })*/
+                
                 finish=0
             }
 
@@ -361,12 +370,14 @@ bot.on('message', msg=>{
                     
                     //console.log(msg.location.latitude+','+msg.location.latitude+' <<'+' <<bu address boliwi kk')
                     if(msg.location!=undefined){
+                        //add_info.push({location:`https://google.com/maps/?q=${msg.location.latitude},${msg.location.longitude}`,chatId:`${msg.chat.id}`})
                         finalCartByChatId.push({location:`https://google.com/maps/?q=${msg.location.latitude},${msg.location.longitude}`,chatId:`${msg.chat.id}`})
                     }else{
                         //PUSH location text
+                        //add_info.push([{location:`${msg.text}`,chatId:`${msg.chat.id}`}])
                         finalCartByChatId.push({location:`${msg.text}`,chatId:`${msg.chat.id}`})
                     }
-                    console.log('last bychi>>>>> '+JSON.stringify(finalCartByChatId,null,4))
+                    //console.log('last bychi>>>>> '+JSON.stringify(finalCartByChatId,null,4))
                     bot.sendMessage(chatId,'🕐 В какое время и когда вы хотите получить?',{
                         reply_markup:{
                             resize_keyboard: true,
