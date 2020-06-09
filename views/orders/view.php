@@ -17,7 +17,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <p>
         <?php if ($model->status == 1){
-            echo Html::a('Prinyat', ['status', 'id' => $model->id, 'status' => 2], [
+            echo Html::a('Принимать', ['status', 'id' => $model->id, 'status' => 2], [
                 'class' => 'btn btn-success',
                 'data' => [
                     'method' => 'post',
@@ -25,7 +25,7 @@ $this->params['breadcrumbs'][] = $this->title;
             ]);
         } ?>
         <?php if ($model->status == 2){
-            echo Html::a('Zavershit', ['status', 'id' => $model->id, 'status' => 0], [
+            echo Html::a('Завершить', ['status', 'id' => $model->id, 'status' => 0], [
                 'class' => 'btn btn-success',
                 'data' => [
                     'method' => 'post',
