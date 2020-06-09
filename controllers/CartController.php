@@ -211,9 +211,19 @@ class CartController extends Controller
     public function actionGetClientOrder($chat_id)
     {
         Yii::$app->response->format = Response::FORMAT_JSON;
-        $order = Orders::find()->where(['client_id' => $chat_id, 'status' => 1])->all();
-        if (!empty($order)){
-            $response = $order;
+        $orders = Orders::find()->where(['client_id' => $chat_id, 'status' => 1])->all();
+        $response = $res = [];
+        if (!empty($orders)){
+            foreach ($orders as $order){
+                $text = '';
+                foreach ($order->carts as $c) {
+                    $text = $text.$c->product->name.' - '.$c->count.' шт = '.$c->cost." UZS\n";
+                }
+                $res = $order->toArray();
+                $res['description'] = $text;
+                $response[] = $res;
+            }
+            return $response;
         }
         else $response = "There is no order of this user";
         return $response;
