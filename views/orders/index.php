@@ -1,5 +1,6 @@
 <?php
 
+use kartik\date\DatePicker;
 use yii\grid\ActionColumn;
 use yii\helpers\Html;
 use yii\grid\GridView;
@@ -31,10 +32,44 @@ $this->params['breadcrumbs'][] = $this->title;
             'client_id',
             'cost',
             'count',
-            //'location',
-            //'status',
-            //'created_at',
-            //'updated_at',
+            'location',
+            [
+                'attribute' => 'created_at',
+                'value' => function ($model) {
+                    return date('d.m.Y H:i', $model->created_at);
+                },
+                'filter' => DatePicker::widget([
+                    'model' => $searchModel,
+                    'attribute' => 'created_at',
+                    'options' =>[
+                        'readonly'=>'true'
+                    ],
+                    'pluginOptions' => [
+                        'autoclose' => true,
+                        'format' => 'yyyy-mm-dd',
+                        'todayHighlight' => true
+                    ]
+                ])
+            ],
+            [
+                'attribute' => 'status',
+                'filter' => [1=>'В ожидании', 2=>'В процессе', 0=>'Завершенный'],
+                'value' => function($model){
+                    if ($model->status == 1){
+                        return 'В ожидании';
+                    }
+                    elseif ($model->status == 2){
+                        return 'В процессе';
+                    }
+                    elseif ($model->status == 0){
+                        return 'Завершенный';
+                    }
+                    else{
+                        return '-';
+                    }
+                }
+            ],
+//            'updated_at',
 
             ['class' => ActionColumn::className(),'template'=>'{view} {delete}' ],
         ],

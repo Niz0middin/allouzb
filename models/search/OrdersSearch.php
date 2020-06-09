@@ -17,8 +17,8 @@ class OrdersSearch extends Orders
     public function rules()
     {
         return [
-            [['id', 'client_id', 'count', 'status', 'created_at', 'updated_at'], 'integer'],
-            [['order_key', 'location'], 'safe'],
+            [['id', 'client_id', 'count', 'status'], 'integer'],
+            [['order_key', 'location', 'created_at', 'updated_at'], 'safe'],
             [['cost'], 'number'],
         ];
     }
@@ -64,9 +64,13 @@ class OrdersSearch extends Orders
             'cost' => $this->cost,
             'count' => $this->count,
             'status' => $this->status,
-            'created_at' => $this->created_at,
-            'updated_at' => $this->updated_at,
+//            'created_at' => $this->created_at,
+//            'updated_at' => $this->updated_at,
         ]);
+
+        if(!empty($this->created_at)){
+            $query->andFilterWhere(['between', 'created_at', strtotime($this->created_at),strtotime($this->created_at)+86399]);
+        }
 
         $query->andFilterWhere(['like', 'order_key', $this->order_key])
             ->andFilterWhere(['like', 'location', $this->location]);

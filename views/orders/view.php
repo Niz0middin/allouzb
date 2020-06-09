@@ -6,7 +6,7 @@ use yii\widgets\DetailView;
 /* @var $this yii\web\View */
 /* @var $model app\models\Orders */
 
-$this->title = $model->id;
+$this->title = $model->order_key;
 $this->params['breadcrumbs'][] = ['label' => 'Заказы', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 \yii\web\YiiAsset::register($this);
@@ -35,9 +35,35 @@ $this->params['breadcrumbs'][] = $this->title;
             'cost',
             'count',
             'location',
-            'status',
-            'created_at',
-            'updated_at',
+            [
+                'attribute' => 'created_at',
+                'value' => function ($model) {
+                    return date('d.m.Y H:i', $model->created_at);
+                },
+            ],
+            [
+                'attribute' => 'updated_at',
+                'value' => function ($model) {
+                    return date('d.m.Y H:i', $model->updated_at);
+                },
+            ],
+            [
+                'attribute' => 'status',
+                'value' => function($model){
+                    if ($model->status == 1){
+                        return 'В ожидании';
+                    }
+                    elseif ($model->status == 2){
+                        return 'В процессе';
+                    }
+                    elseif ($model->status == 0){
+                        return 'Завершенный';
+                    }
+                    else{
+                        return '-';
+                    }
+                }
+            ],
         ],
     ]) ?>
 
