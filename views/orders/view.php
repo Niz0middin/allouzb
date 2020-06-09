@@ -87,7 +87,7 @@ $this->params['breadcrumbs'][] = $this->title;
         <thead>
         <tr>
             <th>Имя</th>
-<!--            <th>Цена</th>-->
+            <th>Цена</th>
             <th>Количество</th>
             <th>Сумма</th>
             <th>Создан</th>
@@ -97,7 +97,7 @@ $this->params['breadcrumbs'][] = $this->title;
         <?php foreach ($model->carts as $cart){ ?>
         <tr>
             <td><?= $cart->product->name ?></td>
-<!--            <td>--><?//= $cart->product->cost ?><!--</td>-->
+            <td><?= $cart->cost/$cart->count ?></td>
             <td><?= $cart->count ?></td>
             <td><?= $cart->cost ?></td>
             <td><?= date('d.m.Y H:i',$cart->created_at) ?></td>
