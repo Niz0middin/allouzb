@@ -1,7 +1,6 @@
 <?php
 
 use kartik\date\DatePicker;
-use yii\grid\ActionColumn;
 use yii\helpers\Html;
 use yii\grid\GridView;
 
@@ -12,6 +11,17 @@ use yii\grid\GridView;
 $this->title = 'Заказы';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
+<style>
+    tr:hover{
+        cursor: pointer!important;
+    }
+    .input-group-addon{
+        background-color: white!important;
+    }
+    input{
+        background-color: white!important;
+    }
+</style>
 <div class="orders-index">
 
     <h1><?= Html::encode($this->title) ?></h1>
@@ -25,6 +35,32 @@ $this->params['breadcrumbs'][] = $this->title;
     <?= GridView::widget([
         'dataProvider' => $dataProvider,
         'filterModel' => $searchModel,
+        'rowOptions'=>function ($model, $key, $index, $grid){
+            switch ($model->status) {
+                case 1:
+                    $status = 'warning';
+                    break;
+                case 2:
+                    $status = 'info';
+                    break;
+                case 0:
+                    $status = 'success';
+                    break;
+                default:
+                    $status = 'default';
+            }
+            return [
+                'id' => $key,
+                'ondblclick' => 'location.href="'
+                    . Yii::$app->urlManager->createUrl('/orders/view')
+                    .'?id="+(this.id)',
+                'class' => $status
+            ];
+        },
+        'layout'=> "{summary}\n{items}\n{pager}",
+        'tableOptions' => [
+            'class' => 'table table-bordered table-striped table-hover',
+        ],
         'columns' => [
             ['class' => 'yii\grid\SerialColumn'],
 
@@ -71,7 +107,7 @@ $this->params['breadcrumbs'][] = $this->title;
             ],
 //            'updated_at',
 
-            ['class' => ActionColumn::className(),'template'=>'{view} {delete}' ],
+//            ['class' => ActionColumn::className(),'template'=>'{view} {delete}' ],
         ],
     ]); ?>
 

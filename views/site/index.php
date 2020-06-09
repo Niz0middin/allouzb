@@ -24,9 +24,9 @@ $this->title = 'Allouzb';
             <div class="col-md-4">
                 <p><a class="btn btn-lg btn-success" href="/news">Новости</a></p>
             </div>
-            <div class="col-md-4">
-                <p><a class="btn btn-lg btn-success" href="/cart">Корзинка</a></p>
-            </div>
+<!--            <div class="col-md-4">-->
+<!--                <p><a class="btn btn-lg btn-success" href="/cart">Корзинка</a></p>-->
+<!--            </div>-->
             <div class="col-md-4">
                 <p><a class="btn btn-lg btn-success" href="/orders">Заказы</a></p>
             </div>

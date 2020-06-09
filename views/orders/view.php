@@ -13,12 +13,12 @@ $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="orders-view">
 
-    <h1><?= Html::encode($this->title) ?></h1>
+<!--    <h1>--><?//= Html::encode($this->title) ?><!--</h1>-->
 
     <p>
         <?php if ($model->status == 1){
             echo Html::a('Принимать', ['status', 'id' => $model->id, 'status' => 2], [
-                'class' => 'btn btn-success',
+                'class' => 'btn btn-primary',
                 'data' => [
                     'method' => 'post',
                 ],
@@ -32,7 +32,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 ],
             ]);
         } ?>
-        <?= Html::a('Изменить', ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
+<!--        --><?//= Html::a('Изменить', ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
         <?= Html::a('Удалить', ['delete', 'id' => $model->id], [
             'class' => 'btn btn-danger',
             'data' => [
@@ -82,5 +82,27 @@ $this->params['breadcrumbs'][] = $this->title;
             ],
         ],
     ]) ?>
-
+    <h3>Корзинка</h3>
+    <table class="table table-bordered table-striped">
+        <thead>
+        <tr>
+            <th>Имя</th>
+            <th>Цена</th>
+            <th>Количество</th>
+            <th>Сумма</th>
+            <th>Создан</th>
+        </tr>
+        </thead>
+        <tbody>
+        <?php foreach ($model->carts as $cart){ ?>
+        <tr>
+            <td><?= $cart->product->name ?></td>
+            <td><?= $cart->product->cost ?></td>
+            <td><?= $cart->count ?></td>
+            <td><?= $cart->cost*$cart->count ?></td>
+            <td><?= date('d.m.Y H:i',$cart->created_at) ?></td>
+        </tr>
+        <?php } ?>
+        </tbody>
+    </table>
 </div>
