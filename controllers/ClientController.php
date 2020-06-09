@@ -3,16 +3,16 @@
 namespace app\controllers;
 
 use Yii;
-use app\models\Orders;
-use app\models\search\OrdersSearch;
+use app\models\Client;
+use app\models\search\ClientSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 
 /**
- * OrdersController implements the CRUD actions for Orders model.
+ * ClientController implements the CRUD actions for Client model.
  */
-class OrdersController extends Controller
+class ClientController extends Controller
 {
     /**
      * {@inheritdoc}
@@ -24,26 +24,19 @@ class OrdersController extends Controller
                 'class' => VerbFilter::className(),
                 'actions' => [
                     'delete' => ['POST'],
-                    'status' => ['POST'],
                 ],
             ],
         ];
     }
 
     /**
-     * Lists all Orders models.
+     * Lists all Client models.
      * @return mixed
      */
     public function actionIndex()
     {
-        $searchModel = new OrdersSearch();
+        $searchModel = new ClientSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
-        $dataProvider->pagination = ['pageSize' => 100];
-        $dataProvider->setSort([
-            'defaultOrder' => [
-                'created_at' => SORT_DESC
-            ]
-        ]);
 
         return $this->render('index', [
             'searchModel' => $searchModel,
@@ -52,7 +45,7 @@ class OrdersController extends Controller
     }
 
     /**
-     * Displays a single Orders model.
+     * Displays a single Client model.
      * @param integer $id
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
@@ -65,29 +58,25 @@ class OrdersController extends Controller
     }
 
     /**
-     * Creates a new Orders model.
+     * Creates a new Client model.
      * If creation is successful, the browser will be redirected to the 'view' page.
      * @return mixed
      */
-//    public function actionCreate()
-//    {
-//        $model = new Orders();
-//
-//        if ($model->load(Yii::$app->request->post())) {
-//
-//            $model->order_key = strtoupper(uniqid());
-//            $model->save();
-//
-//            return $this->redirect(['view', 'id' => $model->id]);
-//        }
-//
-//        return $this->render('create', [
-//            'model' => $model,
-//        ]);
-//    }
+    public function actionCreate()
+    {
+        $model = new Client();
+
+        if ($model->load(Yii::$app->request->post()) && $model->save()) {
+            return $this->redirect(['view', 'id' => $model->id]);
+        }
+
+        return $this->render('create', [
+            'model' => $model,
+        ]);
+    }
 
     /**
-     * Updates an existing Orders model.
+     * Updates an existing Client model.
      * If update is successful, the browser will be redirected to the 'view' page.
      * @param integer $id
      * @return mixed
@@ -107,7 +96,7 @@ class OrdersController extends Controller
     }
 
     /**
-     * Deletes an existing Orders model.
+     * Deletes an existing Client model.
      * If deletion is successful, the browser will be redirected to the 'index' page.
      * @param integer $id
      * @return mixed
@@ -120,26 +109,16 @@ class OrdersController extends Controller
         return $this->redirect(['index']);
     }
 
-
-    public function actionStatus($id, $status)
-    {
-        $model = $this->findModel($id);
-        $model->status = $status;
-        $model->save();
-
-        return $this->redirect(['view', 'id' => $model->id]);
-    }
-
     /**
-     * Finds the Orders model based on its primary key value.
+     * Finds the Client model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.
      * @param integer $id
-     * @return Orders the loaded model
+     * @return Client the loaded model
      * @throws NotFoundHttpException if the model cannot be found
      */
     protected function findModel($id)
     {
-        if (($model = Orders::findOne($id)) !== null) {
+        if (($model = Client::findOne($id)) !== null) {
             return $model;
         }
 

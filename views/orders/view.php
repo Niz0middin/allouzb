@@ -6,8 +6,8 @@ use yii\widgets\DetailView;
 /* @var $this yii\web\View */
 /* @var $model app\models\Orders */
 
-$this->title = $model->id;
-$this->params['breadcrumbs'][] = ['label' => 'Orders', 'url' => ['index']];
+$this->title = $model->order_key;
+$this->params['breadcrumbs'][] = ['label' => 'Заказы', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 \yii\web\YiiAsset::register($this);
 ?>
@@ -16,11 +16,27 @@ $this->params['breadcrumbs'][] = $this->title;
     <h1><?= Html::encode($this->title) ?></h1>
 
     <p>
-        <?= Html::a('Update', ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
-        <?= Html::a('Delete', ['delete', 'id' => $model->id], [
+        <?php if ($model->status == 1){
+            echo Html::a('Принимать', ['status', 'id' => $model->id, 'status' => 2], [
+                'class' => 'btn btn-success',
+                'data' => [
+                    'method' => 'post',
+                ],
+            ]);
+        } ?>
+        <?php if ($model->status == 2){
+            echo Html::a('Завершить', ['status', 'id' => $model->id, 'status' => 0], [
+                'class' => 'btn btn-success',
+                'data' => [
+                    'method' => 'post',
+                ],
+            ]);
+        } ?>
+        <?= Html::a('Изменить', ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
+        <?= Html::a('Удалить', ['delete', 'id' => $model->id], [
             'class' => 'btn btn-danger',
             'data' => [
-                'confirm' => 'Are you sure you want to delete this item?',
+                'confirm' => 'Удалить?',
                 'method' => 'post',
             ],
         ]) ?>
@@ -35,9 +51,35 @@ $this->params['breadcrumbs'][] = $this->title;
             'cost',
             'count',
             'location',
-            'status',
-            'created_at',
-            'updated_at',
+            [
+                'attribute' => 'created_at',
+                'value' => function ($model) {
+                    return date('d.m.Y H:i', $model->created_at);
+                },
+            ],
+            [
+                'attribute' => 'updated_at',
+                'value' => function ($model) {
+                    return date('d.m.Y H:i', $model->updated_at);
+                },
+            ],
+            [
+                'attribute' => 'status',
+                'value' => function($model){
+                    if ($model->status == 1){
+                        return 'В ожидании';
+                    }
+                    elseif ($model->status == 2){
+                        return 'В процессе';
+                    }
+                    elseif ($model->status == 0){
+                        return 'Завершенный';
+                    }
+                    else{
+                        return '-';
+                    }
+                }
+            ],
         ],
     ]) ?>
 

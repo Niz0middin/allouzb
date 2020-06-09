@@ -17,8 +17,9 @@ class CartSearch extends Cart
     public function rules()
     {
         return [
-            [['id', 'product_id', 'order_id', 'count', 'created_at', 'updated_at'], 'integer'],
+            [['id', 'product_id', 'order_id', 'count'], 'integer'],
             [['cost'], 'number'],
+            [['created_at', 'updated_at'], 'safe'],
         ];
     }
 
@@ -63,9 +64,13 @@ class CartSearch extends Cart
             'order_id' => $this->order_id,
             'cost' => $this->cost,
             'count' => $this->count,
-            'created_at' => $this->created_at,
-            'updated_at' => $this->updated_at,
+//            'created_at' => $this->created_at,
+//            'updated_at' => $this->updated_at,
         ]);
+
+        if(!empty($this->created_at)){
+            $query->andFilterWhere(['between', 'created_at', strtotime($this->created_at),strtotime($this->created_at)+86399]);
+        }
 
         return $dataProvider;
     }

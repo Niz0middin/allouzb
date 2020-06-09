@@ -3,13 +3,13 @@
 use yii\helpers\Html;
 
 /* @var $this yii\web\View */
-/* @var $model app\models\Cart */
+/* @var $model app\models\Client */
 
 $this->title = 'Создать';
-$this->params['breadcrumbs'][] = ['label' => 'Корзинка', 'url' => ['index']];
+$this->params['breadcrumbs'][] = ['label' => 'Клиенты', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
-<div class="cart-create">
+<div class="client-create">
 
     <h1><?= Html::encode($this->title) ?></h1>
 

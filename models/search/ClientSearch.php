@@ -4,12 +4,12 @@ namespace app\models\search;
 
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
-use app\models\Orders;
+use app\models\Client;
 
 /**
- * OrdersSearch represents the model behind the search form of `app\models\Orders`.
+ * ClientSearch represents the model behind the search form of `app\models\Client`.
  */
-class OrdersSearch extends Orders
+class ClientSearch extends Client
 {
     /**
      * {@inheritdoc}
@@ -17,9 +17,8 @@ class OrdersSearch extends Orders
     public function rules()
     {
         return [
-            [['id', 'client_id', 'count', 'status'], 'integer'],
-            [['order_key', 'location', 'created_at', 'updated_at'], 'safe'],
-            [['cost'], 'number'],
+            [['id'], 'integer'],
+            [['name', 'tel'], 'safe'],
         ];
     }
 
@@ -41,7 +40,7 @@ class OrdersSearch extends Orders
      */
     public function search($params)
     {
-        $query = Orders::find();
+        $query = Client::find();
 
         // add conditions that should always apply here
 
@@ -60,20 +59,10 @@ class OrdersSearch extends Orders
         // grid filtering conditions
         $query->andFilterWhere([
             'id' => $this->id,
-            'client_id' => $this->client_id,
-            'cost' => $this->cost,
-            'count' => $this->count,
-            'status' => $this->status,
-//            'created_at' => $this->created_at,
-//            'updated_at' => $this->updated_at,
         ]);
 
-        if(!empty($this->created_at)){
-            $query->andFilterWhere(['between', 'created_at', strtotime($this->created_at),strtotime($this->created_at)+86399]);
-        }
-
-        $query->andFilterWhere(['like', 'order_key', $this->order_key])
-            ->andFilterWhere(['like', 'location', $this->location]);
+        $query->andFilterWhere(['like', 'name', $this->name])
+            ->andFilterWhere(['like', 'tel', $this->tel]);
 
         return $dataProvider;
     }

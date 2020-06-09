@@ -65,16 +65,16 @@ class Orders extends \yii\db\ActiveRecord
     {
         return [
             'id' => 'ID',
-            'order_key' => 'Order Key',
-            'client_id' => 'Client ID',
-            'cost' => 'Cost',
-            'count' => 'Count',
-            'location' => 'Location',
-            'time' => 'Time',
-            'tel' => 'Telephone',
-            'status' => 'Status',
-            'created_at' => 'Created At',
-            'updated_at' => 'Updated At',
+            'order_key' => 'Номер заказа',
+            'client_id' => 'Клиент',
+            'cost' => 'Общая сумма',
+            'count' => 'Общая количество',
+            'location' => 'Локация',
+            'time' => 'Время',
+            'tel' => 'Телефон',
+            'status' => 'Статус',
+            'created_at' => 'Создан',
+            'updated_at' => 'Изменен',
         ];
     }
 
