@@ -144,6 +144,39 @@ bot.on('message', msg=>{
             })
             break
         case kb.home.orders:
+            fetch(`http://allouzb/cart/get-client-order?chat_id=${chatId}`).then(response => response.json())
+                .then(data=>{
+                    
+                    if(data!=null){
+
+                    
+                    var orders = data
+                    orders.forEach(json=>{
+                        if(json.status==1){
+                            var status = 'Статус в ожидании'
+                        }else{
+                            status=json.status
+                        }
+                        bot.sendChatAction(chatId,'typing')
+                        .then(()=>{
+                            bot.sendMessage(chatId,'📝 Заказ № '+json.order_key+'\n\n🛎 Статус: '+status+'\n🕖 Дата: '+json.time+'\n💵 Общая сумма: '
+                                +json.cost+' UZS'+'\n\n🚚 Доставка: Доставить/Yetqazib berish\n'+'📍 Адрес: '+json.location+'\n\n🛍 Товары: \n'+json.description,{
+                                reply_markup:{
+                                    keyboard:keyboard.home,
+                                    resize_keyboard:true
+                                }
+                        
+                    })
+                        })
+                    })
+
+                }else{
+                    bot.sendMessage(chatId,'⚠️ Нет никаких заказов!📦')
+                }
+
+                })
+
+                
             break
         
         case kb.home.news:
@@ -355,10 +388,36 @@ bot.on('message', msg=>{
                 //console.log('first_name'+msg.from.first_name)
                 //console.log('second_name'+msg.from.last_name)
                 //console.log('username '+msg.from.username)
-                bot.sendMessage(chatId,'Your order has been established!!!\n'+JSON.stringify(send_finalCartByChatId,null,4))
-                /*.then(()=>{
-                    add_info.splice([1].chatId==msg.chat.id,3)
-                })*/
+                fetch(`http://allouzb/cart/make`,{method:'POST',headers:{"Content-Type":"application/json"},body:JSON.stringify(send_finalCartByChatId)})
+                .then((res)=>{
+                    return res.json()
+                })
+                .then((json)=>{
+                    //console.log('your KEY>>>'+JSON.stringify(json))
+                    
+                    if(json.status==1){
+                        var status = 'Статус в ожидании'
+                    }else{
+                        status=json.status
+                    }
+                    bot.sendMessage(chatId,'📝 Заказ № '+json.order_key+'\n\n🛎 Статус: '+status+'\n🕖 Дата: '+json.time+'\n💵 Общая сумма: '
+                    +json.cost+' UZS'+'\n\n🚚 Доставка: Доставить/Yetqazib berish\n'+'📍 Адрес: '+json.location+'\n\n🛍 Товары: \n'+json.description,{
+                        reply_markup:{
+                            keyboard:keyboard.home,
+                            resize_keyboard:true
+                        }
+                        
+                    })
+                    .then(()=>{
+                        bot.sendMessage(chatId,'✅ Ваш заказ был принят и статус в ожидании. Пожалуйста, подождите, вы будете уведомлены о статусе вашего заказа.'+
+                        '\n\nКонтактная информация оператора: '+'@username\nНаш адрес: xxxxxx xxxxx\nТелефон: +99891 111 11 11')
+                    })
+                   
+                   
+                    
+                })
+                
+               
                 
                 finish=0
             }
@@ -422,7 +481,7 @@ console.log('add kupit knopka')
         .then(data=>{
         
         //var description=dataObj.slice(4,dataObj.length).join(" ")
-        var description = data.description
+        var description = /*data.description*/ data.name+' - '+data.description
          
          //console.log('here add>>>>  '+dataObj[0]) //add digan text
          console.log('here id>>>>  '+dataObj[2]) //id
@@ -729,7 +788,7 @@ console.log('Qara buyoga>>>>>>>'+calculated_cost)
                     good_counter=good_counter+1
                     bot.sendChatAction(query.message.chat.id,'upload_photo').then(()=>{
                         bot.sendPhoto(query.message.chat.id,'.'+good.img.substr(12,good.img.length),{
-                            caption:good.description,
+                            caption:good.name+' - '+good.description,
                             reply_markup:{
                                 inline_keyboard:[
                                     [{text:'🛍 Купить - '+good.cost+' UZS' ,callback_data:'add'+' '+good.cost+' '+good.id+' '+counter}]
