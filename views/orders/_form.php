@@ -27,7 +27,7 @@ $clients = ArrayHelper::map(Client::find()->all(), 'id', 'id');
 
     <?= $form->field($model, 'location')->textInput(['maxlength' => true]) ?>
 
-    <?= $form->field($model, 'status')->dropDownList([1 => 'Активный', 0 => 'Неактивный']) ?>
+    <?= $form->field($model, 'status')->dropDownList([1=>'В ожидании', 2=>'В процессе', 0=>'Завершенный']) ?>
 
     <div class="form-group">
         <?= Html::submitButton('Save', ['class' => 'btn btn-success']) ?>
