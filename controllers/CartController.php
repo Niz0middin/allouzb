@@ -135,6 +135,7 @@ class CartController extends Controller
         $carts = [];
         $tel = $chat_id = $time = $location = null;
         $total_count = $total_cost = 0;
+
         $requests = Yii::$app->request->post();
 
         foreach ($requests as $request){
@@ -155,7 +156,7 @@ class CartController extends Controller
 
         foreach ($carts as $cart) {
             $total_count = $total_count + $cart['count'];
-            $total_cost = $total_cost + $cart['cost'];
+            $total_cost = $total_cost + $cart['count']*$cart['cost'];
         }
 
         $order = new Orders();
@@ -174,7 +175,7 @@ class CartController extends Controller
             $model = new Cart();
             $model->product_id = $cart['id'];
             $model->order_id = $order->id;
-            $model->cost = $cart['cost'];
+            $model->cost = $cart['count']*$cart['cost'];
             $model->count = $cart['count'];
             $model->save();
             $error['cart'][] = $model->getErrors();
