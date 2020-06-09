@@ -6,7 +6,7 @@ const kb = require('./keyboard-buttons')
 //const ikb = require('./inline-keyboard')
 //const fs = require('fs')
 const fetch = require('node-fetch')  //installed npm node-fetch for api
-//const mysql = require('mysql')
+const mysql = require('mysql')
 
 helper.logStart()
 const bot = new TelegramBot(config.TOKEN,{
@@ -25,6 +25,24 @@ bot.on('polling_error', (error) => {
 });
 
 bot.onText(/\/start/,msg=>{
+    var connection = mysql.createConnection({
+        host     : 'localhost',
+        user     : 'root',
+        password : 'root',
+        database : 'allouzb'
+      });
+       
+      connection.connect();
+      
+      if(msg.from.username==undefined){
+          var username=null
+      }
+      
+      connection.query(`REPLACE client (id,name) VALUES(${msg.from.id},${username})`,(err,results,fields)=>{
+           if(err) console.log('DataBase Error>> '+err);
+       })
+      connection.end()
+
     const text = `Добро пожаловать на наш магазин ${msg.from.first_name}\nВыберетье команду:`
     bot.sendMessage(helper.getChatId(msg),text,{
         reply_markup:{
@@ -146,8 +164,8 @@ bot.on('message', msg=>{
         case kb.home.orders:
             fetch(`http://allouzb/cart/get-client-order?chat_id=${chatId}`).then(response => response.json())
                 .then(data=>{
-                    
-                    if(data!=null){
+                    console.log(JSON.stringify(data));
+                    if(data!='There is no order of this user'){
 
                     
                     var orders = data
