@@ -25,10 +25,10 @@ $this->title = 'Allouzb';
                 <p><a class="btn btn-lg btn-success" href="/news">Новости</a></p>
             </div>
             <div class="col-md-5">
-                <p><a class="btn btn-lg btn-success" href="/cart">Cart</a></p>
+                <p><a class="btn btn-lg btn-success" href="/cart">Корзинка</a></p>
             </div>
             <div class="col-md-5">
-                <p><a class="btn btn-lg btn-success" href="/orders">Orders</a></p>
+                <p><a class="btn btn-lg btn-success" href="/orders">Заказы</a></p>
             </div>
         </div>
     </div>

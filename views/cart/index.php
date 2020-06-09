@@ -1,5 +1,6 @@
 <?php
 
+use yii\grid\ActionColumn;
 use yii\helpers\Html;
 use yii\grid\GridView;
 
@@ -7,16 +8,16 @@ use yii\grid\GridView;
 /* @var $searchModel app\models\search\CartSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->title = 'Carts';
+$this->title = 'Корзинка';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="cart-index">
 
     <h1><?= Html::encode($this->title) ?></h1>
 
-    <p>
-        <?= Html::a('Create Cart', ['create'], ['class' => 'btn btn-success']) ?>
-    </p>
+<!--    <p>-->
+<!--        --><?//= Html::a('Создать', ['create'], ['class' => 'btn btn-success']) ?>
+<!--    </p>-->
 
     <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
 
@@ -26,14 +27,14 @@ $this->params['breadcrumbs'][] = $this->title;
         'columns' => [
             ['class' => 'yii\grid\SerialColumn'],
 
-            'product_id',
-            'order_id',
+            'product.name',
+            'order.order_key',
             'cost',
             'count',
-            //'created_at',
-            //'updated_at',
+            'created_at',
+            'updated_at',
 
-            ['class' => 'yii\grid\ActionColumn'],
+            ['class' => ActionColumn::className(),'template'=>'{view} {delete}' ]
         ],
     ]); ?>
 

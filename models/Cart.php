@@ -58,12 +58,12 @@ class Cart extends \yii\db\ActiveRecord
     {
         return [
             'id' => 'ID',
-            'product_id' => 'Product ID',
-            'order_id' => 'Order ID',
-            'cost' => 'Cost',
-            'count' => 'Count',
-            'created_at' => 'Created At',
-            'updated_at' => 'Updated At',
+            'product_id' => 'Товар',
+            'order_id' => 'Заказ',
+            'cost' => 'Сумма',
+            'count' => 'Количество',
+            'created_at' => 'Создан',
+            'updated_at' => 'Изменен',
         ];
     }
 
