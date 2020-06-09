@@ -24,6 +24,7 @@ class OrdersController extends Controller
                 'class' => VerbFilter::className(),
                 'actions' => [
                     'delete' => ['POST'],
+                    'status' => ['POST'],
                 ],
             ],
         ];
@@ -117,6 +118,16 @@ class OrdersController extends Controller
         $this->findModel($id)->delete();
 
         return $this->redirect(['index']);
+    }
+
+
+    public function actionStatus($id, $status)
+    {
+        $model = $this->findModel($id);
+        $model->status = $status;
+        $model->save();
+
+        return $this->redirect(['view', 'id' => $model->id]);
     }
 
     /**
