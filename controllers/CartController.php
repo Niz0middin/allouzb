@@ -181,7 +181,13 @@ class CartController extends Controller
         }
 
         if (empty($error['order'] && empty($error['cart']))){
-            $message = 'success';
+            $response = $order->toArray();
+            $text = '';
+            foreach ($order->carts as $c) {
+                $text = $text.$c->product->name.' - '.$c->count.' шт = '.$c->cost." UZS\n";
+            }
+                $response['description'] = $text;
+            $message = $response;
         }else{
             $message = $error;
         }

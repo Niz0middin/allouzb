@@ -25,6 +25,7 @@ use yii\behaviors\TimestampBehavior;
  */
 class Orders extends \yii\db\ActiveRecord
 {
+    public $description;
     /**
      * {@inheritdoc}
      */
@@ -53,6 +54,7 @@ class Orders extends \yii\db\ActiveRecord
             [['order_key', 'time', 'tel'], 'string', 'max' => 50],
             [['location'], 'string', 'max' => 100],
             [['client_id'], 'exist', 'skipOnError' => true, 'targetClass' => Client::className(), 'targetAttribute' => ['client_id' => 'id']],
+            [['description'], 'safe'],
         ];
     }
 
