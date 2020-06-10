@@ -13,8 +13,8 @@ const bot = new TelegramBot(config.TOKEN,{
     polling: true
 })
 
-var indexOf=0, lock=0, address_lock=0, finish=0, id
-var finalCartByChatId=[], add_info=[]
+var indexOf=0, lock=0, address_lock=0, phone_lock=0, finish=0, id
+var finalCartByChatId=[]
 // Listen on the 'polling_error' event
 bot.on('polling_error', (error) => {
 	var time = new Date();
@@ -119,10 +119,10 @@ bot.on('message', msg=>{
             break
 //bitta teppadigi home.bin bilan birxil
         case '◀️ Назад в корзину':
+            address_lock=0, phone_lock=0, finish=0
             console.log('BINda>>'+JSON.stringify(cartByChatId))
             
             if(cartByChatId.length == 0){
-                console.log('cart null')
                 bot.sendMessage(chatId,'В корзине пусто 🛒\n Посмотрите Каталог, там много интересного')
 
             }else{
@@ -154,6 +154,7 @@ bot.on('message', msg=>{
             break
         
         case '🚫 Отменить Заказ':
+            address_lock=0, phone_lock=0, finish=0
             bot.sendMessage(chatId,'❌ Ваш Заказ был отменен.\n',{
                 reply_markup:{
                     keyboard: keyboard.home,
@@ -171,13 +172,16 @@ bot.on('message', msg=>{
                     var orders = data
                     orders.forEach(json=>{
                         if(json.status==1){
-                            var status = 'Статус в ожидании'
-                        }else{
+                            var status = '🕐 В ожидании'
+                        }else if(json.status==2){
+                            status = '✅ Ваш заказ одобрен'
+                        }
+                        else{
                             status=json.status
                         }
                         bot.sendChatAction(chatId,'typing')
                         .then(()=>{
-                            bot.sendMessage(chatId,'📝 Заказ № '+json.order_key+'\n\n🛎 Статус: '+status+'\n🕖 Дата: '+json.time+'\n💵 Общая сумма: '
+                            bot.sendMessage(chatId,'📝 Заказ № '+json.order_key+'\n\n🛎 Статус: '+status+'\n📅 Дата: '+json.time+'\n💵 Общая сумма: '
                                 +json.cost+' UZS'+'\n\n🚚 Доставка: Доставить/Yetqazib berish\n'+'📍 Адрес: '+json.location+'\n\n🛍 Товары: \n'+json.description,{
                                 reply_markup:{
                                     keyboard:keyboard.home,
@@ -189,7 +193,7 @@ bot.on('message', msg=>{
                     })
 
                 }else{
-                    bot.sendMessage(chatId,'⚠️ Нет никаких заказов!📦')
+                    bot.sendMessage(chatId,'⚠️ Нет никаких заказов!')
                 }
 
                 })
@@ -314,8 +318,10 @@ bot.on('message', msg=>{
             break
 
         case '🚚📦 Доставить/Yetqazib\nberish':
-            var total_amount = 0    
+            if(cartByChatId.length!=0){
+                
             
+            var total_amount = 0    
             for(var i in cartByChatId){
                 total_amount=total_amount + parseFloat(cartByChatId[i].cost)*cartByChatId[i].count
             }
@@ -330,8 +336,7 @@ bot.on('message', msg=>{
             
             //PUSH chatid
             finalCartByChatId = cartByChatId
-            
-            
+            phone_lock=1
             bot.sendMessage(chatId,'☎️ Поделитесь своим номером телефона:',{
                 reply_markup:{
                     one_time_keyboard:true,
@@ -345,12 +350,12 @@ bot.on('message', msg=>{
             })
              .then(()=>{
                 bot.once("contact",(msg)=>{
-                    
+                    phone_lock=0
                     //console.log(JSON.stringify(msg))
                     console.log('name by contact>> '+msg.contact.first_name+'\nphone number>> '+msg.contact.phone_number) 
                     
                     //PUSH phonenumber
-                    //add_info.push([{phonenumber:`${msg.contact.phone_number}`,chatId:`${msg.chat.id}`}])
+                    
                     finalCartByChatId.push({phonenumber:`${msg.contact.phone_number}`,chatId:`${msg.chat.id}`})
                     address_lock=1
                     bot.sendMessage(msg.chat.id,'📍 Пожалуйста, отправьте ваше местоположение: ',{
@@ -365,7 +370,14 @@ bot.on('message', msg=>{
                     })
                 })
             })
-
+            }else{
+                bot.sendMessage(chatId,'⚠️ Ваша корзина пуста!',{
+                    reply_markup:{
+                        keyboard: keyboard.home,
+                        resize_keyboard: true 
+                    }
+                })
+            }
 
             break
 
@@ -411,8 +423,6 @@ bot.on('message', msg=>{
                     return res.json()
                 })
                 .then((json)=>{
-                    //console.log('your KEY>>>'+JSON.stringify(json))
-                    
                     if(json.status==1){
                         var status = 'Статус в ожидании'
                     }else{
@@ -429,9 +439,9 @@ bot.on('message', msg=>{
                     .then(()=>{
                         bot.sendMessage(chatId,'✅ Ваш заказ был принят и статус в ожидании. Пожалуйста, подождите, вы будете уведомлены о статусе вашего заказа.'+
                         '\n\nКонтактная информация оператора: '+'@username\nНаш адрес: xxxxxx xxxxx\nТелефон: +99891 111 11 11')
+                        //removeItemFromCartAll(chatId);
+                        finalCartByChatId.length=0
                     })
-                   
-                   
                     
                 })
                 
@@ -468,6 +478,25 @@ bot.on('message', msg=>{
                     finish=1
                 }
              //end of geo location jonatiw
+
+
+                if(phone_lock==1){
+                    //PUSH phonenumber
+                    
+                    finalCartByChatId.push({phonenumber:`${msg.text}`,chatId:`${msg.chat.id}`})
+                    address_lock=1
+                    bot.sendMessage(msg.chat.id,'📍 Пожалуйста, отправьте ваше местоположение: ',{
+                        reply_markup:{
+                            one_time_keyboard:true,
+                            resize_keyboard:true,
+                            keyboard:[
+                                ['◀️ Назад в корзину'],
+                                ['🚫 Отменить Заказ']
+                            ]
+                        }
+                    })
+                    phone_lock=0
+                }
 
             }
 
@@ -889,6 +918,32 @@ console.log('Qara buyoga>>>>>>>'+calculated_cost)
                     break
                 }
             }
+        }
+
+        function removeItemFromCartAll(chatId){
+            console.log('looookkkkk'+JSON.stringify(cart))
+            var c=0, i=0
+            for(i in cart){
+                if(cart[i].chatId===chatId){
+                    i++
+                }
+            }
+
+            cart.forEach(item=>{
+                
+                if(item.chatId===chatId){
+                    cart.splice(c,i)
+                }
+                c++
+            })
+            console.log('AFTER ....'+JSON.stringify(cart))
+/*
+            for(var i in cart){
+                if(cart[i].chatId===chatId){
+                    cart.splice(i,1)
+                    break
+                }
+            }*/
         }
         
 
