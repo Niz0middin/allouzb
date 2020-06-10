@@ -2,9 +2,11 @@
 
 namespace app\controllers;
 
+use app\models\Client;
 use Yii;
 use app\models\Orders;
 use app\models\search\OrdersSearch;
+use yii\helpers\Url;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -127,7 +129,28 @@ class OrdersController extends Controller
         $model->status = $status;
         $model->save();
 
+        $token = '1135110620:AAGflZkeU_Z8vCUj_H5y1nqfK8SB7vb_2H8';
+        $chat_id = $model->client->id;
+        $message = "✅ Статус вашего заказа был изменен. пожалуйста, проверьте ваши заказы. Ваш номер заказа: $model->order_key";
+        $this->sendMessage($chat_id, $message, $token);
+
         return $this->redirect(['view', 'id' => $model->id]);
+    }
+
+
+    function sendMessage($chatID, $message, $token) {
+
+        $url = "https://api.telegram.org/bot" . $token . "/sendMessage?chat_id=" . $chatID;
+        $url = $url . "&text=" . urlencode($message);
+        $ch = curl_init();
+        $optArray = array(
+            CURLOPT_URL => $url,
+            CURLOPT_RETURNTRANSFER => true
+        );
+        curl_setopt_array($ch, $optArray);
+        $result = curl_exec($ch);
+        curl_close($ch);
+        return $result;
     }
 
     /**
