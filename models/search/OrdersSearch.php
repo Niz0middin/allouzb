@@ -18,7 +18,7 @@ class OrdersSearch extends Orders
     {
         return [
             [['id', 'client_id', 'count', 'status'], 'integer'],
-            [['order_key', 'location', 'created_at', 'updated_at'], 'safe'],
+            [['order_key', 'location', 'created_at', 'updated_at', 'tel', 'time'], 'safe'],
             [['cost'], 'number'],
         ];
     }
@@ -64,6 +64,8 @@ class OrdersSearch extends Orders
             'cost' => $this->cost,
             'count' => $this->count,
             'status' => $this->status,
+            'time' => $this->time,
+            'tel' => $this->tel,
 //            'created_at' => $this->created_at,
 //            'updated_at' => $this->updated_at,
         ]);

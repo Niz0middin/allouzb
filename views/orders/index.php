@@ -65,10 +65,26 @@ $this->params['breadcrumbs'][] = $this->title;
             ['class' => 'yii\grid\SerialColumn'],
 
             'order_key',
-            'client_id',
-            'cost',
+            'tel',
+            'time',
+//            'client_id',
+            [
+                'attribute' => 'location',
+                'value' => function($model){
+                    $a = $model->location;
+                    if (filter_var($a, FILTER_VALIDATE_URL)) {
+                        return "<a href='$model->location' target='_blank'>$model->location</a>";
+                    }else return $model->location;
+                },
+                'format' => 'raw'
+            ],
+            [
+                'attribute' => 'cost',
+                'value' => function($model){
+                    return $model->cost.' UZS';
+                },
+            ],
             'count',
-            'location',
             [
                 'attribute' => 'created_at',
                 'value' => function ($model) {
@@ -89,10 +105,10 @@ $this->params['breadcrumbs'][] = $this->title;
             ],
             [
                 'attribute' => 'status',
-                'filter' => [1=>'В ожидании', 2=>'В процессе', 0=>'Завершенный'],
+                'filter' => [1=>'Новый', 2=>'В процессе', 0=>'Завершенный'],
                 'value' => function($model){
                     if ($model->status == 1){
-                        return 'В ожидании';
+                        return 'Новый';
                     }
                     elseif ($model->status == 2){
                         return 'В процессе';

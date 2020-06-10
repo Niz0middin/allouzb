@@ -30,6 +30,12 @@ $this->params['breadcrumbs'][] = $this->title;
 //            'id',
             'name',
             [
+                'attribute' => 'cost',
+                'value' => function($model){
+                    return $model->cost.' UZS';
+                },
+            ],
+            [
                 'attribute' => 'category_id',
                 'label' => 'Категория',
                 'format' => 'raw',
