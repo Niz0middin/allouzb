@@ -66,6 +66,16 @@ $this->params['breadcrumbs'][] = $this->title;
 
             'order_key',
             'tel',
+            [
+                'attribute' => 'client_id',
+                'value' => function($model){
+                    if (isset($model->client->name)){
+                        return "<a href='https://t.me/".$model->client->name."' target='_blank'>".$model->client->name."</a>";
+                    }else return '-';
+                },
+                'format' => 'raw',
+                'label' => 'Телеграм'
+            ],
             'time',
 //            'client_id',
             [
