@@ -68,7 +68,7 @@ bot.on('message', msg=>{
                 }
             })
             .then(()=>{
-                fetch('http://allouzb/category/get')
+                fetch(config.pre_url+'/category/get')
                     .then(response => response.json())
                     .then(data=>{
                         var send_to_root=key_value_pairs(data.data)
@@ -101,7 +101,7 @@ bot.on('message', msg=>{
                 }
             //console.log('total_amount: '+total_amount)   
 
-                fetch(`http://allouzb/product/img?id=${dataObj[2]}`).then(response => response.json())
+                fetch(config.pre_url+`/product/img?id=${dataObj[2]}`).then(response => response.json())
                 .then(data=>{
                     bot.sendMessage(chatId,'🛍 Корзина:\n '+cartByChatId[0].cost+' UZS '+' x '+cartByChatId[0].count+' = '+calculated_cost+' UZS '+'\n\n'+'<a href="allouzb'+data.img+'">'+data.description+'</a>',{
                         reply_markup:{
@@ -136,9 +136,9 @@ bot.on('message', msg=>{
                 }
             //console.log('total_amount: '+total_amount)   
 
-                fetch(`http://allouzb/product/img?id=${dataObj[2]}`).then(response => response.json())
+                fetch(config.pre_url+`/product/img?id=${dataObj[2]}`).then(response => response.json())
                 .then(data=>{
-                    bot.sendMessage(chatId,'🛍 Корзина:\n '+cartByChatId[0].cost+' UZS '+' x '+cartByChatId[0].count+' = '+calculated_cost+' UZS '+'\n\n'+'<a href="allouzb'+data.img+'">'+data.description+'</a>',{
+                    bot.sendMessage(chatId,'🛍 Корзина:\n '+cartByChatId[0].cost+' UZS '+' x '+cartByChatId[0].count+' = '+calculated_cost+' UZS '+'\n\n'+'<a href="'+config.pre_url_picture+data.img+'">'+data.description+'</a>',{
                         reply_markup:{
                             inline_keyboard: [
                                 [{text:'❌',callback_data:'❌'},{text:'🔻',callback_data:'🔻'},{text:cartByChatId[indexOf].count+' шт.',callback_data:'c'},{text:'🔺',callback_data:'🔺'}],
@@ -163,7 +163,7 @@ bot.on('message', msg=>{
             })
             break
         case kb.home.orders:
-            fetch(`http://allouzb/cart/get-client-order?chat_id=${chatId}`).then(response => response.json())
+            fetch(config.pre_url+`/cart/get-client-order?chat_id=${chatId}`).then(response => response.json())
                 .then(data=>{
                     console.log(JSON.stringify(data));
                     if(data!='There is no order of this user'){
@@ -202,9 +202,12 @@ bot.on('message', msg=>{
             break
         
         case kb.home.news:
-            fetch('http://allouzb/news/get')
+            fetch(config.pre_url+'/news/get')
             .then(response => response.json())
             .then(data=>{
+                if(data!=null){
+
+                
                 id = data.id
                 bot.sendChatAction(chatId,"upload_photo").then(()=>{
                     bot.sendPhoto(chatId,'.'+data.img.substr(12,data.img.length),{
@@ -215,11 +218,15 @@ bot.on('message', msg=>{
                         }
                     })
                 }) 
+            }else{
+                bot.sendMessage(chatId,'📰 Новостей пока нет!')
+            }
             })
+            
             break
         //more knopka bosilganda
         case kb.more.more:
-                fetch(`http://allouzb/news/get?id=${id}`).then(response => response.json())
+                fetch(config.pre_url+`/news/get?id=${id}`).then(response => response.json())
                 .then(data=>{
                     if(data==null){
                         bot.sendMessage(chatId,'⚠️ Других новостей пока нет! 🗞')
@@ -305,7 +312,7 @@ bot.on('message', msg=>{
 
 
         case kb.exit.mcatalogue:
-            fetch('http://allouzb/category/get')
+            fetch(config.pre_url+'/category/get')
             .then(response => response.json())
             .then(data=>{
                 var send_to_root=key_value_pairs(data.data)
@@ -419,7 +426,7 @@ bot.on('message', msg=>{
                 //console.log('first_name'+msg.from.first_name)
                 //console.log('second_name'+msg.from.last_name)
                 //console.log('username '+msg.from.username)
-                fetch(`http://allouzb/cart/make`,{method:'POST',headers:{"Content-Type":"application/json"},body:JSON.stringify(send_finalCartByChatId)})
+                fetch(config.pre_url+`/cart/make`,{method:'POST',headers:{"Content-Type":"application/json"},body:JSON.stringify(send_finalCartByChatId)})
                 .then((res)=>{
                     return res.json()
                 })
@@ -525,7 +532,7 @@ console.log('add kupit knopka')
         dataObj=query.data.split(" ")
         counter=parseInt(dataObj[3])+1
 
-        fetch(`http://allouzb/product/img?id=${dataObj[2]}`).then(response => response.json())
+        fetch(config.pre_url+`/product/img?id=${dataObj[2]}`).then(response => response.json())
         .then(data=>{
         
         //var description=dataObj.slice(4,dataObj.length).join(" ")
@@ -569,9 +576,9 @@ console.log('BINda>>'+JSON.stringify(cart))
             }
             //console.log('total_amount: '+total_amount)   
 
-        fetch(`http://allouzb/product/img?id=${dataObj[2]}`).then(response => response.json())
+        fetch(config.pre_url+`/product/img?id=${dataObj[2]}`).then(response => response.json())
         .then(data=>{
-            bot.sendMessage(query.message.chat.id,'Корзина:\n '+cartByChatId[0].cost+' UZS '+' x '+cartByChatId[0].count+' = '+calculated_cost+' UZS '+'\n\n'+'<a href="allouzb'+data.img+'">'+data.description+'</a>',{
+            bot.sendMessage(query.message.chat.id,'Корзина:\n '+cartByChatId[0].cost+' UZS '+' x '+cartByChatId[0].count+' = '+calculated_cost+' UZS '+'\n\n'+'<a href="'+config.pre_url_picture+data.img+'">'+data.description+'</a>',{
                 reply_markup:{
                     inline_keyboard: [
                         [{text:'❌',callback_data:'❌'},{text:'🔻',callback_data:'🔻'},{text:cart[indexOf].count+' шт.',callback_data:'c'},{text:'🔺',callback_data:'🔺'}],
@@ -618,9 +625,9 @@ console.log('BINda>>'+JSON.stringify(cart))
             }
 
         dataObj[2]=cartByChatId[indexOf].id
-        fetch(`http://allouzb/product/img?id=${dataObj[2]}`).then(response => response.json())
+        fetch(config.pre_url+`/product/img?id=${dataObj[2]}`).then(response => response.json())
             .then(data=>{
-            bot.editMessageText('Корзина:\n '+cartByChatId[indexOf].cost+' UZS '+' x '+cartByChatId[indexOf].count+' = '+calculated_cost+' UZS \n\n'+'<a href="allouzb'+data.img+'">'+data.description+'</a>',{
+            bot.editMessageText('Корзина:\n '+cartByChatId[indexOf].cost+' UZS '+' x '+cartByChatId[indexOf].count+' = '+calculated_cost+' UZS \n\n'+'<a href="'+config.pre_url_picture+data.img+'">'+data.description+'</a>',{
                 chat_id: query.message.chat.id,
                 message_id:query.message.message_id,
                 reply_markup:{
@@ -638,7 +645,7 @@ console.log('BINda>>'+JSON.stringify(cart))
         }else{
             console.log('cart empty(')
             bot.deleteMessage(query.message.chat.id,query.message.message_id).then(()=>{
-                fetch('http://allouzb/category/get')
+                fetch(config.pre_url+'/category/get')
                     .then(response => response.json())
                     .then(data=>{
                         //var send_to_root=key_value_pairs(data.data)
@@ -671,9 +678,9 @@ console.log('chap<<'+dataObj[2])
                     total_amount=total_amount + parseFloat(cartByChatId[i].cost) * cartByChatId[i].count
                 }
 
-        fetch(`http://allouzb/product/img?id=${dataObj[2]}`).then(response => response.json())
+        fetch(config.pre_url+`/product/img?id=${dataObj[2]}`).then(response => response.json())
         .then(data=>{
-                bot.editMessageText('Корзина:\n '+cartByChatId[indexOf].cost+' UZS '+' x '+cartByChatId[indexOf].count+' = '+calculated_cost+' UZS \n\n'+'<a href="allouzb'+data.img+'">'+data.description+'</a>',{
+                bot.editMessageText('Корзина:\n '+cartByChatId[indexOf].cost+' UZS '+' x '+cartByChatId[indexOf].count+' = '+calculated_cost+' UZS \n\n'+'<a href="'+config.pre_url_picture+data.img+'">'+data.description+'</a>',{
                     chat_id: query.message.chat.id,
                     message_id:query.message.message_id,
                     reply_markup:{
@@ -705,9 +712,9 @@ console.log('ong>>'+dataObj[2])
                 }
                 
                 
-            fetch(`http://allouzb/product/img?id=${dataObj[2]}`).then(response => response.json())
+            fetch(config.pre_url+`/product/img?id=${dataObj[2]}`).then(response => response.json())
                 .then(data=>{ 
-                bot.editMessageText('Корзина:\n '+cartByChatId[indexOf].cost+' UZS '+' x '+cartByChatId[indexOf].count+' = '+calculated_cost+' UZS \n\n'+'<a href="allouzb'+data.img+'">'+data.description+'</a>',{
+                bot.editMessageText('Корзина:\n '+cartByChatId[indexOf].cost+' UZS '+' x '+cartByChatId[indexOf].count+' = '+calculated_cost+' UZS \n\n'+'<a href="'+config.pre_url_picture+data.img+'">'+data.description+'</a>',{
                     chat_id: query.message.chat.id,
                     message_id:query.message.message_id,
                     reply_markup:{
@@ -737,9 +744,9 @@ console.log('down cart '+JSON.stringify(cartByChatId))
                     total_amount=total_amount + parseFloat(cartByChatId[i].cost)*cartByChatId[i].count
                 }
 
-            fetch(`http://allouzb/product/img?id=${dataObj[2]}`).then(response => response.json())
+            fetch(config.pre_url+`/product/img?id=${dataObj[2]}`).then(response => response.json())
                 .then(data=>{ 
-                bot.editMessageText('Корзина:\n '+cartByChatId[indexOf].cost+' UZS '+' x '+cartByChatId[indexOf].count+' = '+calculated_cost+' UZS \n\n'+'<a href="allouzb'+data.img+'">'+data.description+'</a>',{
+                bot.editMessageText('Корзина:\n '+cartByChatId[indexOf].cost+' UZS '+' x '+cartByChatId[indexOf].count+' = '+calculated_cost+' UZS \n\n'+'<a href="'+config.pre_url_picture+data.img+'">'+data.description+'</a>',{
                     chat_id: query.message.chat.id,
                     message_id:query.message.message_id,
                     reply_markup:{
@@ -773,9 +780,9 @@ console.log('dataObj[2] '+dataObj[2]) //id of pruduct
             }
             
 console.log('Qara buyoga>>>>>>>'+calculated_cost)
-        fetch(`http://allouzb/product/img?id=${dataObj[2]}`).then(response => response.json())
+        fetch(config.pre_url+`/product/img?id=${dataObj[2]}`).then(response => response.json())
             .then(data=>{ 
-            bot.editMessageText('Корзина:\n '+cartByChatId[indexOf].cost+' UZS '+' x '+cartByChatId[indexOf].count+' = '+calculated_cost+' UZS \n\n'+'<a href="allouzb'+data.img+'">'+data.description+'</a>',{
+            bot.editMessageText('Корзина:\n '+cartByChatId[indexOf].cost+' UZS '+' x '+cartByChatId[indexOf].count+' = '+calculated_cost+' UZS \n\n'+'<a href="'+config.pre_url_picture+data.img+'">'+data.description+'</a>',{
                 chat_id: query.message.chat.id,
                 message_id:query.message.message_id,
                 reply_markup:{
@@ -810,7 +817,7 @@ console.log('Qara buyoga>>>>>>>'+calculated_cost)
     else{
     //BY API////////////////////////////// 
 
-        fetch(`http://allouzb/category/get?id=${query.data}`).then(response => response.json())
+        fetch(config.pre_url+`/category/get?id=${query.data}`).then(response => response.json())
         .then(data=>{
             status = data.status //0 -keyboard yoki 1-good
             sub_category = key_value_pairs(data.data) //keyobard
