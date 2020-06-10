@@ -57,6 +57,16 @@ $this->params['breadcrumbs'][] = $this->title;
                 'count',
                 'client_id',
                 'tel',
+                [
+                    'attribute' => 'client_id',
+                    'value' => function($model){
+                        if (isset($model->client->name)){
+                            return "<a href='https://t.me/".$model->client->name."' target='_blank'>".$model->client->name."</a>";
+                        }else return '-';
+                    },
+                    'format' => 'raw',
+                    'label' => 'Телеграм'
+                ],
                 'time',
                 [
                     'attribute' => 'location',
