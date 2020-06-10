@@ -349,8 +349,9 @@ bot.on('message', msg=>{
                 }
             })
              .then(()=>{
+                phone_lock=0
                 bot.once("contact",(msg)=>{
-                    phone_lock=0
+                    
                     //console.log(JSON.stringify(msg))
                     console.log('name by contact>> '+msg.contact.first_name+'\nphone number>> '+msg.contact.phone_number) 
                     
@@ -424,7 +425,7 @@ bot.on('message', msg=>{
                 })
                 .then((json)=>{
                     if(json.status==1){
-                        var status = 'Статус в ожидании'
+                        var status = '🕖 В ожидании'
                     }else{
                         status=json.status
                     }
@@ -439,8 +440,8 @@ bot.on('message', msg=>{
                     .then(()=>{
                         bot.sendMessage(chatId,'✅ Ваш заказ был принят и статус в ожидании. Пожалуйста, подождите, вы будете уведомлены о статусе вашего заказа.'+
                         '\n\nКонтактная информация оператора: '+'@username\nНаш адрес: xxxxxx xxxxx\nТелефон: +99891 111 11 11')
-                        //removeItemFromCartAll(chatId);
-                        finalCartByChatId.length=0
+                         removeItemFromCartAll(chatId);
+                        
                     })
                     
                 })
@@ -556,7 +557,6 @@ console.log('bin v korzinu')
 console.log('BINda>>'+JSON.stringify(cart))
 
 //cartById
-            
             //var description=dataObj.slice(4,dataObj.length).join(" ")
             calculated_cost = cartByChatId[0].cost * cartByChatId[0].count
             dataObj[2]=cartByChatId[indexOf].id
@@ -586,14 +586,21 @@ console.log('BINda>>'+JSON.stringify(cart))
     }else if(query.data=='❌'){
         
         console.log('indexOf initial '+indexOf)
-        if(indexOf==0){
+        if(indexOf>0){
             //indexOf++;
-        }else{
+            dataObj[2]=cartByChatId[indexOf].id
             indexOf--;
+        }else if(indexOf==0){
+            dataObj[2]=cartByChatId[indexOf].id
+            //indexOf++;
+        }
+        else{
+            indexOf--;
+            dataObj[2]=cartByChatId[indexOf+1].id
         }
         
         
-        dataObj[2]=cartByChatId[indexOf].id
+        
         
         console.log('id tovar to be delted >>'+dataObj[2])
         console.log('cartbychatid  '+JSON.stringify(cartByChatId))
@@ -609,6 +616,7 @@ console.log('BINda>>'+JSON.stringify(cart))
             for(var i in cartByChatId){
                 total_amount=total_amount + parseFloat(cartByChatId[i].cost)*cartByChatId[i].count
             }
+
         dataObj[2]=cartByChatId[indexOf].id
         fetch(`http://allouzb/product/img?id=${dataObj[2]}`).then(response => response.json())
             .then(data=>{
@@ -921,29 +929,20 @@ console.log('Qara buyoga>>>>>>>'+calculated_cost)
         }
 
         function removeItemFromCartAll(chatId){
-            console.log('looookkkkk'+JSON.stringify(cart))
-            var c=0, i=0
-            for(i in cart){
-                if(cart[i].chatId===chatId){
-                    i++
-                }
-            }
-
-            cart.forEach(item=>{
-                
-                if(item.chatId===chatId){
-                    cart.splice(c,i)
-                }
-                c++
-            })
-            console.log('AFTER ....'+JSON.stringify(cart))
-/*
+           
             for(var i in cart){
                 if(cart[i].chatId===chatId){
                     cart.splice(i,1)
-                    break
                 }
-            }*/
+            }
+            //bu oxirgi item qop ketvotkani uchun yana bitta loop qivoriw kk
+            for(var i in cart){
+                if(cart[i].chatId===chatId){
+                    cart.splice(i,1)
+                }
+            }
+
+        
         }
         
 
