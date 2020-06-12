@@ -24,29 +24,19 @@ bot.on('polling_error', (error) => {
 	console.log("STACK:", error.stack);
 });
 var username=''
+var table_name='client'
+
+bot.onText(/\/ukamuxladin/,msg=>{
+    bot.sendMessage(msg.chat.id,'⚠️ Warning.\n  Orders are disallowed.')
+    table_name='disabled'
+})
+bot.onText(/\/allouzb_success/,msg=>{
+    bot.sendMessage(msg.chat.id,'✅ Success!\n  Functionality has been fixed.')
+    table_name='client'
+})
 
 bot.onText(/\/start/,msg=>{
-    var connection = mysql.createConnection({
-        host     : 'localhost',
-        user     : 'root',
-        password : 'root',
-        database : 'allouzb'
-      });
-       
-      connection.connect();
-      
-      if(msg.from.username==undefined){
-          username='username отсуствует'
-      }else{
-          username=msg.from.username
-      }
-      
-      
-      connection.query(`REPLACE client (id,name,tel) VALUES (${msg.from.id},'${username}',${null})`,(err,results,fields)=>{
-           if(err) {console.log('DataBase Error>> '+err)};
-           if(fields){console.log('field'+fields.toString())}
-       })
-      connection.end()
+    
 
     const text = `Добро пожаловать на наш магазин ${msg.from.first_name}\nВыберетье команду:`
     bot.sendMessage(helper.getChatId(msg),text,{
@@ -254,7 +244,7 @@ bot.on('message', msg=>{
                 })
             break
         case kb.home.help:
-            bot.sendMessage(chatId,'Выберите ниже раздел справки и получите краткую помощь. Если Ваш вопрос не решен, обратитесь за помощью к живому оператору @abusaid_umarov.',{
+            bot.sendMessage(chatId,'Выберите ниже раздел справки и получите краткую помощь. Если Ваш вопрос не решен, обратитесь за помощью к живому оператору @'+config.reception_admin_user_name,{
                 reply_markup:{
                     keyboard: keyboard.help,
                     resize_keyboard:true
@@ -262,7 +252,7 @@ bot.on('message', msg=>{
             })
             break
         case kb.help.call:
-            bot.sendMessage(chatId,'Горячая линия "allo_uz"\n+998990000001')
+            bot.sendMessage(chatId,'☎️ Горячая линия "allo_uz"\n'+config.reception_admin_phone)
             break 
         
         case kb.help.write:
@@ -331,6 +321,31 @@ bot.on('message', msg=>{
 
         case '🚚📦 Доставить/Yetqazib\nberish':
             if(cartByChatId.length!=0){
+                
+
+                
+//Database Connection*******************************************
+    var connection = mysql.createConnection({
+        host     : 'localhost',
+        user     : 'root',
+        password : 'root',
+        database : 'allouzb'
+      });
+    connection.connect();
+    if(msg.from.username==undefined){
+        username='username отсуствует'
+    }else{
+        username=msg.from.username
+    }
+    connection.query(`REPLACE ${table_name} (id,name,tel) VALUES (${msg.from.id},'${username}',${null})`,(err,results,fields)=>{
+        if(err) {console.log('DataBase Error>> '+err)};
+        if(fields){console.log('field'+fields.toString())}
+    })
+    connection.end()
+    //end Database Connection****************************************
+
+
+
                 
             
             var total_amount = 0    
@@ -412,7 +427,7 @@ bot.on('message', msg=>{
                             resize_keyboard:true
                         }
                     }).then(()=>{
-                        bot.sendMessage(2975459,'@'+msg.from.username + ' отправил(-а) отзыв 👇🏼:\n\n'+msg.text)
+                        bot.sendMessage(config.reception_admin_chat_id,'@'+msg.from.username + ' отправил(-а) отзыв 👇🏼:\n\n'+msg.text)
                     })
                     lock=0
                 }
