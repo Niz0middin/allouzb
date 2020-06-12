@@ -23,6 +23,7 @@ bot.on('polling_error', (error) => {
 	console.log("MSG:", error.message);
 	console.log("STACK:", error.stack);
 });
+var username=''
 
 bot.onText(/\/start/,msg=>{
     var connection = mysql.createConnection({
@@ -35,11 +36,15 @@ bot.onText(/\/start/,msg=>{
       connection.connect();
       
       if(msg.from.username==undefined){
-          var username=null
+          username='username отсуствует'
+      }else{
+          username=msg.from.username
       }
       
-      connection.query(`REPLACE client (id,name) VALUES(${msg.from.id},${username})`,(err,results,fields)=>{
-           if(err) console.log('DataBase Error>> '+err);
+      
+      connection.query(`REPLACE client (id,name,tel) VALUES (${msg.from.id},'${username}',${null})`,(err,results,fields)=>{
+           if(err) {console.log('DataBase Error>> '+err)};
+           if(fields){console.log('field'+fields.toString())}
        })
       connection.end()
 
@@ -249,7 +254,7 @@ bot.on('message', msg=>{
                 })
             break
         case kb.home.help:
-            bot.sendMessage(chatId,'Список команд:\n/catalog - Каталог\n\n Выберите ниже раздел справки и получите краткую помощь. Если Ваш вопрос не решен, обратитесь за помощью к живому оператору @abusaid_umarov.',{
+            bot.sendMessage(chatId,'Выберите ниже раздел справки и получите краткую помощь. Если Ваш вопрос не решен, обратитесь за помощью к живому оператору @abusaid_umarov.',{
                 reply_markup:{
                     keyboard: keyboard.help,
                     resize_keyboard:true
@@ -416,6 +421,7 @@ bot.on('message', msg=>{
             
             
             if(finish==1){
+              if(finalCartByChatId[0].chatId==msg.chat.id){
                 //add_info.push([{time:`${msg.text}`,chatId:`${msg.chat.id}`}])
                 finalCartByChatId.push({time:`${msg.text}`,chatId:`${msg.chat.id}`})
                 console.log('cart>> '+JSON.stringify(finalCartByChatId))
@@ -456,11 +462,13 @@ bot.on('message', msg=>{
                
                 
                 finish=0
+             }
             }
 
 
             //geo location orniga address jonatiw
                 if(address_lock==1){//finish=1
+                  if(finalCartByChatId[0].chatId==msg.chat.id){
                     console.log(JSON.stringify(msg,null,4))
                     
                     //console.log(msg.location.latitude+','+msg.location.latitude+' <<'+' <<bu address boliwi kk')
@@ -484,12 +492,14 @@ bot.on('message', msg=>{
                     })
                     address_lock=0
                     finish=1
+                 }
                 }
              //end of geo location jonatiw
 
 
                 if(phone_lock==1){
                     //PUSH phonenumber
+                  if(finalCartByChatId[0].chatId==msg.chat.id){
                     
                     finalCartByChatId.push({phonenumber:`${msg.text}`,chatId:`${msg.chat.id}`})
                     address_lock=1
@@ -504,7 +514,9 @@ bot.on('message', msg=>{
                         }
                     })
                     phone_lock=0
+                  }
                 }
+                
 
             }
 
