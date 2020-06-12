@@ -33,6 +33,9 @@ $this->title = 'Allouzb';
             <div class="col-md-4">
                 <p><a class="btn btn-lg btn-success" href="/client">Клиенты</a></p>
             </div>
+            <div class="col-md-4">
+                <p><a class="btn btn-lg btn-success" href="/stats">Статистика</a></p>
+            </div>
         </div>
     </div>
 </div>
