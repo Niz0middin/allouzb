@@ -11,17 +11,6 @@ use yii\grid\GridView;
 $this->title = 'Статистика';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
-<style>
-    tr:hover{
-        cursor: pointer!important;
-    }
-    .input-group-addon{
-        background-color: white!important;
-    }
-    input{
-        background-color: white!important;
-    }
-</style>
 <div class="orders-index">
 
     <h1><?= Html::encode($this->title) ?></h1>
@@ -41,7 +30,14 @@ $this->params['breadcrumbs'][] = $this->title;
             <?= GridView::widget([
                 'dataProvider' => $dataProvider,
                 'filterModel' => $searchModel,
-                'layout'=> "{summary}\n{items}\n{pager}",
+                'rowOptions'=>function ($model, $key, $index, $grid){
+                    return [
+                        'id' => $model->client_id,
+                        'ondblclick' => 'location.href="'
+                            . Yii::$app->urlManager->createUrl('/stats/client-view')
+                            .'?id="+(this.id)',
+                    ];
+                },
                 'columns' => [
                     ['class' => 'yii\grid\SerialColumn'],
                     'client_id',
@@ -53,15 +49,20 @@ $this->params['breadcrumbs'][] = $this->title;
                             }else return '-';
                         },
                         'format' => 'raw',
-                        'label' => 'Телеграм'
+                        'label' => 'Телеграм',
+                        'filter' => false,
                     ],
                     [
                         'attribute' => 'cost',
                         'value' => function($model){
                             return $model->cost.' UZS';
                         },
+                        'filter' => false
                     ],
-                    'count',
+                    [
+                        'attribute' => 'count',
+                        'filter' => false,
+                    ],
 //            'updated_at',
 
 //            ['class' => ActionColumn::className(),'template'=>'{view} {delete}' ],

@@ -23,6 +23,17 @@ AppAsset::register($this);
     <title><?= Html::encode($this->title) ?></title>
     <?php $this->head() ?>
 </head>
+<style>
+    .input-group-addon{
+        background-color: white!important;
+    }
+    input{
+        background-color: white!important;
+    }
+    tr:hover{
+        cursor: pointer!important;
+    }
+</style>
 <body>
 <?php $this->beginBody() ?>
 

@@ -6,7 +6,7 @@ use yii\widgets\DetailView;
 /* @var $this yii\web\View */
 /* @var $model app\models\Cart */
 
-$this->title = \app\models\Product::findOne($_GET['id'])->name;
+$this->title = \app\models\Client::findOne($_GET['id'])->id;
 $this->params['breadcrumbs'][] = ['label' => 'Статистика', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 \yii\web\YiiAsset::register($this);
@@ -29,10 +29,10 @@ $this->params['breadcrumbs'][] = $this->title;
         <?php foreach ($model as $cart){ ?>
             <tr>
 <!--                <td>--><?//= $cart->product->name ?><!--</td>-->
-                <td><?= $cart->cost/$cart->count ?> UZS</td>
-                <td><?= $cart->count ?></td>
-                <td><?= $cart->cost ?> UZS</td>
-                <td><?= date('d.m.Y H:i',$cart->created_at) ?></td>
+                <td><?= $cart['cost']/$cart['count'] ?> UZS</td>
+                <td><?= $cart['count'] ?></td>
+                <td><?= $cart['cost'] ?> UZS</td>
+                <td><?= date('d.m.Y H:i',$cart['created_at']) ?></td>
             </tr>
         <?php } ?>
         </tbody>

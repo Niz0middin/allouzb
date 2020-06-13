@@ -41,7 +41,7 @@ use yii\widgets\ActiveForm;
                     'language' => 'ru',
                     'autoclose' => true,
                 ],
-            ]) ?>
+            ])->label('С') ?>
         </div>
 
         <div class="col-md-3">
@@ -55,14 +55,14 @@ use yii\widgets\ActiveForm;
                     'language' => 'ru',
                     'autoclose' => true,
                 ],
-            ]) ?>
+            ])->label('До') ?>
         </div>
 
             <?php // echo $form->field($model, 'updated_at') ?>
 
             <div class="form-group" style="margin-top: 25px">
-                <?= Html::submitButton('Search', ['class' => 'btn btn-primary']) ?>
-                <?= Html::resetButton('Reset', ['class' => 'btn btn-outline-secondary']) ?>
+                <?= Html::submitButton('Поиск', ['class' => 'btn btn-primary']) ?>
+                <?= Html::resetButton('Сброс', ['class' => 'btn btn-outline-secondary']) ?>
             </div>
 
     </div>

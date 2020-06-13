@@ -1,7 +1,9 @@
 <?php
 
+use app\models\Product;
 use kartik\date\DatePicker;
 use yii\grid\ActionColumn;
+use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 use yii\grid\GridView;
 
@@ -32,14 +34,34 @@ $this->params['breadcrumbs'][] = $this->title;
             <?= GridView::widget([
                 'dataProvider' => $dataProvider,
                 'filterModel' => $searchModel,
+                'rowOptions'=>function ($model, $key, $index, $grid){
+                    return [
+                        'id' => $model->product_id,
+                        'ondblclick' => 'location.href="'
+                            . Yii::$app->urlManager->createUrl('/stats/view')
+                            .'?id="+(this.id)',
+                    ];
+                },
                 'columns' => [
                     ['class' => 'yii\grid\SerialColumn'],
 
-                    'product.name',
+                    [
+                        'attribute' => 'product_id',
+                        'value' => function($model){
+                            return $model->product->name;
+                        },
+                        'filter' => ArrayHelper::map(Product::find()->all(), 'id', 'name')
+                    ],
 //            'product.name',
 //            'order.order_key',
-                    'cost',
-                    'count',
+                    [
+                        'attribute' => 'cost',
+                        'filter' => false,
+                    ],
+                    [
+                        'attribute' => 'count',
+                        'filter' => false,
+                    ],
 //            [
 //                'attribute' => 'created_at',
 //                'value' => function ($model) {
@@ -60,7 +82,7 @@ $this->params['breadcrumbs'][] = $this->title;
 //            ],
 //            'updated_at',
 
-                    ['class' => ActionColumn::className(),'template'=>'{view} {delete}' ]
+//                    ['class' => ActionColumn::className(),'template'=>'{view} {delete}' ]
                 ],
             ]); ?>
         </div>

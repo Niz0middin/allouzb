@@ -94,8 +94,21 @@ class StatsController extends Controller
      */
     public function actionView($id)
     {
+        $model = Cart::find()->where(['product_id' => $id])->orderBy(['created_at' => SORT_DESC])->all();
         return $this->render('view', [
-            'model' => $this->findModel($id),
+            'model' => $model,
+        ]);
+    }
+
+
+    public function actionClientView($id)
+    {
+        $model = Cart::find()->select(['cart.*'])->leftJoin('orders', '`orders`.`id` = `cart`.`order_id`')->where(['orders.client_id' => $id])->orderBy(['created_at' => SORT_DESC])->asArray()->all();
+//        echo "<pre>";
+//        print_r($model);
+//        die;
+        return $this->render('client-view', [
+            'model' => $model,
         ]);
     }
 

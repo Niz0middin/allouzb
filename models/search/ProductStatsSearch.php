@@ -68,8 +68,8 @@ class ProductStatsSearch extends Cart
 //            'id' => $this->id,
             'product_id' => $this->product_id,
 //            'order_id' => $this->order_id,
-//            'cost' => $this->cost,
-//            'count' => $this->count,
+            'cost' => $this->cost,
+            'count' => $this->count,
 //            'created_at' => $this->created_at,
 //            'updated_at' => $this->updated_at,
         ]);
