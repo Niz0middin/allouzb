@@ -3,6 +3,7 @@
 namespace app\controllers;
 
 use app\models\Orders;
+use app\models\search\ClientStatsSearch;
 use app\models\search\ProductStatsSearch;
 use Yii;
 use app\models\Cart;
@@ -64,6 +65,26 @@ class StatsController extends Controller
             'dataProvider' => $dataProvider,
         ]);
     }
+
+
+    public function actionClient()
+    {
+        $searchModel = new ClientStatsSearch();
+        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+        $dataProvider->pagination = ['pageSize' => 100];
+        $dataProvider->setSort([
+            'defaultOrder' => [
+                'created_at' => SORT_DESC
+            ]
+        ]);
+
+        return $this->render('client', [
+            'searchModel' => $searchModel,
+            'dataProvider' => $dataProvider,
+        ]);
+    }
+
+
 
     /**
      * Displays a single Cart model.

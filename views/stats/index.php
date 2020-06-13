@@ -20,19 +20,26 @@ $this->params['breadcrumbs'][] = $this->title;
 <!--        --><?//= Html::a('Создать', ['create'], ['class' => 'btn btn-success']) ?>
 <!--    </p>-->
 
-    <?php echo $this->render('_search', ['model' => $searchModel]); ?>
+    <ul class="nav nav-tabs">
+        <li class="active"><a>По продуктам</a></li>
+        <li><a href="/stats/client">По клиентам</a></li>
+    </ul>
 
-    <?= GridView::widget([
-        'dataProvider' => $dataProvider,
-        'filterModel' => $searchModel,
-        'columns' => [
-            ['class' => 'yii\grid\SerialColumn'],
+    <div class="tab-content">
+        <div id="menu1" class="tab-pane fade in active" style="margin-top: 20px">
+            <?php echo $this->render('_search', ['model' => $searchModel]); ?>
 
-            'product.name',
+            <?= GridView::widget([
+                'dataProvider' => $dataProvider,
+                'filterModel' => $searchModel,
+                'columns' => [
+                    ['class' => 'yii\grid\SerialColumn'],
+
+                    'product.name',
 //            'product.name',
 //            'order.order_key',
-            'cost',
-            'count',
+                    'cost',
+                    'count',
 //            [
 //                'attribute' => 'created_at',
 //                'value' => function ($model) {
@@ -53,9 +60,13 @@ $this->params['breadcrumbs'][] = $this->title;
 //            ],
 //            'updated_at',
 
-            ['class' => ActionColumn::className(),'template'=>'{view} {delete}' ]
-        ],
-    ]); ?>
+                    ['class' => ActionColumn::className(),'template'=>'{view} {delete}' ]
+                ],
+            ]); ?>
+        </div>
+    </div>
+
+
 
 
 </div>
