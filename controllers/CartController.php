@@ -239,6 +239,7 @@ class CartController extends Controller
         if (!empty($orders)){
             foreach ($orders as $order){
                 $order->created_at = date('H:i d.m.Y', $order->created_at);
+                $order->updated_at = date('H:i d.m.Y', $order->updated_at);
                 $text = '';
                 foreach ($order->carts as $c) {
                     $text = $text.$c->product->name.' - '.$c->count.' шт = '.$c->cost." UZS\n";
