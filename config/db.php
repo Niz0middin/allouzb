@@ -2,9 +2,9 @@
 
 return [
     'class' => 'yii\db\Connection',
-    'dsn' => 'mysql:host=localhost;dbname=allouzbu_db',
-    'username' => 'allouzbu_root',
-    'password' => 'LiE7gCXO9p',
+    'dsn' => 'mysql:host=localhost;dbname=allouzb',
+    'username' => 'root',
+    'password' => 'root',
     'charset' => 'utf8mb4',
 
     // Schema cache options (for production environment)
