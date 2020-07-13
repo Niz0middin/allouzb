@@ -2,6 +2,7 @@
 
 namespace app\controllers;
 
+use app\models\Client;
 use app\models\Orders;
 use Yii;
 use app\models\Cart;
@@ -162,6 +163,11 @@ class CartController extends Controller
             if (isset($request['phonenumber'])){
                 $tel = $request['phonenumber'];
                 $chat_id = $request['chatId'];
+                $client = Client::findOne($chat_id);
+                if (isset($client)){
+                    $client->tel = $tel;
+                    $client->save();
+                }
             }
             if (isset($request['location'])){
                 $location = $request['location'];
@@ -232,6 +238,8 @@ class CartController extends Controller
         $response = $res = [];
         if (!empty($orders)){
             foreach ($orders as $order){
+                $order->created_at = date('H:i d.m.Y', $order->created_at);
+                $order->updated_at = date('H:i d.m.Y', $order->updated_at);
                 $text = '';
                 foreach ($order->carts as $c) {
                     $text = $text.$c->product->name.' - '.$c->count.' шт = '.$c->cost." UZS\n";

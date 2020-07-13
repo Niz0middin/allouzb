@@ -476,7 +476,7 @@ bot.on('message', msg=>{
                         
                     })
                     .then(()=>{
-                        bot.sendMessage(-1001394878997,'🛎 New order has arrived № '+json.order_key+'\n Update orders table')
+                        bot.sendMessage(-1001394878997,'🛎 Новый заказ принят № '+json.order_key+'.\nПожалуйста, обновите ваш браузер.🔄')
                     })
                     
                 })
