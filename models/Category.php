@@ -4,6 +4,7 @@ namespace app\models;
 
 use Yii;
 use creocoder\nestedsets\NestedSetsBehavior;
+use yii\behaviors\TimestampBehavior;
 
 /**
  * This is the model class for table "category".
@@ -30,7 +31,7 @@ class Category extends \yii\db\ActiveRecord
 
     public function behaviors() {
         return [
-            \yii\behaviors\TimeStampBehavior::className(),
+            TimeStampBehavior::className(),
             'tree' => [
                 'class' => NestedSetsBehavior::className(),
                 'treeAttribute' => 'tree',
