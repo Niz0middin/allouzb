@@ -1,3 +1,7 @@
+//https://www.youtube.com/watch?v=_TMUowcFP5c&list=PLoN_ejT35AEhzNoPStBzAkpqAu3YQwPj7&index=10
+// cart uchun tutorial ozi bitkan cart
+
+
 const TelegramBot = require('node-telegram-bot-api')
 const config = require('./config')
 const helper = require('./helper')
@@ -323,7 +327,7 @@ bot.on('message', msg=>{
             if(cartByChatId.length!=0){
                 
 
-                
+
 //Database Connection*******************************************
     var connection = mysql.createConnection({
         host     : 'localhost',
@@ -471,6 +475,9 @@ bot.on('message', msg=>{
                          removeItemFromCartAll(chatId);
                         
                     })
+                    .then(()=>{
+                        bot.sendMessage(-1001394878997,'🛎 New order has arrived № '+json.order_key+'\n Update orders table')
+                    })
                     
                 })
                 
@@ -605,12 +612,12 @@ console.log('BINda>>'+JSON.stringify(cart))
 
         fetch(config.pre_url+`/product/img?id=${dataObj[2]}`).then(response => response.json())
         .then(data=>{
-            bot.sendMessage(query.message.chat.id,'Корзина:\n '+cartByChatId[0].cost+' UZS '+' x '+cartByChatId[0].count+' = '+calculated_cost+' UZS '+'\n\n'+'<a href="'+config.pre_url_picture+data.img+'">'+data.description+'</a>',{
+            bot.sendMessage(query.message.chat.id,'Корзина:\n '+cartByChatId[0].cost+' UZS '+' x '+cartByChatId[0].count+' = '+calculated_cost.toFixed(2)+' UZS '+'\n\n'+'<a href="'+config.pre_url_picture+data.img+'">'+data.description+'</a>',{
                 reply_markup:{
                     inline_keyboard: [
                         [{text:'❌',callback_data:'❌'},{text:'🔻',callback_data:'🔻'},{text:cart[indexOf].count+' шт.',callback_data:'c'},{text:'🔺',callback_data:'🔺'}],
                         [{text:'◀️',callback_data:'◀️'},{text: (indexOf+1)+'/'+cartByChatId.length,callback_data:'nu'},{text:'▶️',callback_data:'▶️'}],
-                        [{text:'✅ Заказ на '+total_amount+' UZS Оформить?',callback_data:'formalize'}]
+                        [{text:'✅ Заказ на '+total_amount.toFixed(2)+' UZS Оформить?',callback_data:'formalize'}]
                     ]
                 },
                 parse_mode:'HTML'
@@ -654,14 +661,14 @@ console.log('BINda>>'+JSON.stringify(cart))
         dataObj[2]=cartByChatId[indexOf].id
         fetch(config.pre_url+`/product/img?id=${dataObj[2]}`).then(response => response.json())
             .then(data=>{
-            bot.editMessageText('Корзина:\n '+cartByChatId[indexOf].cost+' UZS '+' x '+cartByChatId[indexOf].count+' = '+calculated_cost+' UZS \n\n'+'<a href="'+config.pre_url_picture+data.img+'">'+data.description+'</a>',{
+            bot.editMessageText('Корзина:\n '+cartByChatId[indexOf].cost+' UZS '+' x '+cartByChatId[indexOf].count+' = '+calculated_cost.toFixed(2)+' UZS \n\n'+'<a href="'+config.pre_url_picture+data.img+'">'+data.description+'</a>',{
                 chat_id: query.message.chat.id,
                 message_id:query.message.message_id,
                 reply_markup:{
                     inline_keyboard:[
                         [{text:'❌',callback_data:'❌'},{text:'🔻',callback_data:'🔻'},{text:cartByChatId[indexOf].count+' шт.',callback_data:'c'},{text:'🔺',callback_data:'🔺'}],
                         [{text:'◀️',callback_data:'◀️'},{text: (indexOf+1)+'/'+cartByChatId.length,callback_data:'nu'},{text:'▶️',callback_data:'▶️'}],
-                        [{text:'✅ Заказ на '+total_amount+' UZS Оформить?',callback_data:'formalize'}]
+                        [{text:'✅ Заказ на '+total_amount.toFixed(2)+' UZS Оформить?',callback_data:'formalize'}]
                     ]
                 },
                 parse_mode:'HTML'
@@ -707,14 +714,14 @@ console.log('chap<<'+dataObj[2])
 
         fetch(config.pre_url+`/product/img?id=${dataObj[2]}`).then(response => response.json())
         .then(data=>{
-                bot.editMessageText('Корзина:\n '+cartByChatId[indexOf].cost+' UZS '+' x '+cartByChatId[indexOf].count+' = '+calculated_cost+' UZS \n\n'+'<a href="'+config.pre_url_picture+data.img+'">'+data.description+'</a>',{
+                bot.editMessageText('Корзина:\n '+cartByChatId[indexOf].cost+' UZS '+' x '+cartByChatId[indexOf].count+' = '+calculated_cost.toFixed(2)+' UZS \n\n'+'<a href="'+config.pre_url_picture+data.img+'">'+data.description+'</a>',{
                     chat_id: query.message.chat.id,
                     message_id:query.message.message_id,
                     reply_markup:{
                         inline_keyboard:[
                             [{text:'❌',callback_data:'❌'},{text:'🔻',callback_data:'🔻'},{text:cartByChatId[indexOf].count+' шт.',callback_data:'c'},{text:'🔺',callback_data:'🔺'}],
                             [{text:'◀️',callback_data:'◀️'},{text: (indexOf+1)+'/'+cartByChatId.length,callback_data:'nu'},{text:'▶️',callback_data:'▶️'}],
-                            [{text:'✅ Заказ на '+total_amount+' UZS Оформить?',callback_data:'formalize'}]
+                            [{text:'✅ Заказ на '+total_amount.toFixed(2)+' UZS Оформить?',callback_data:'formalize'}]
                         ]
                     },
                     parse_mode:'HTML'
@@ -741,14 +748,14 @@ console.log('ong>>'+dataObj[2])
                 
             fetch(config.pre_url+`/product/img?id=${dataObj[2]}`).then(response => response.json())
                 .then(data=>{ 
-                bot.editMessageText('Корзина:\n '+cartByChatId[indexOf].cost+' UZS '+' x '+cartByChatId[indexOf].count+' = '+calculated_cost+' UZS \n\n'+'<a href="'+config.pre_url_picture+data.img+'">'+data.description+'</a>',{
+                bot.editMessageText('Корзина:\n '+cartByChatId[indexOf].cost+' UZS '+' x '+cartByChatId[indexOf].count+' = '+calculated_cost.toFixed(2)+' UZS \n\n'+'<a href="'+config.pre_url_picture+data.img+'">'+data.description+'</a>',{
                     chat_id: query.message.chat.id,
                     message_id:query.message.message_id,
                     reply_markup:{
                         inline_keyboard:[
                             [{text:'❌',callback_data:'❌'},{text:'🔻',callback_data:'🔻'},{text:cartByChatId[indexOf].count+' шт.',callback_data:'c'},{text:'🔺',callback_data:'🔺'}],
                             [{text:'◀️',callback_data:'◀️'},{text: (indexOf+1)+'/'+cartByChatId.length,callback_data:'nu'},{text:'▶️',callback_data:'▶️'}],
-                            [{text:'✅ Заказ на '+total_amount+' UZS Оформить?',callback_data:'formalize'}]
+                            [{text:'✅ Заказ на '+total_amount.toFixed(2)+' UZS Оформить?',callback_data:'formalize'}]
                         ]
                     },
                     parse_mode:'HTML'
@@ -768,19 +775,19 @@ console.log('down cart '+JSON.stringify(cartByChatId))
 
                 var total_amount = 0    
                 for(var i in cartByChatId){
-                    total_amount=total_amount + parseFloat(cartByChatId[i].cost)*cartByChatId[i].count
+                    total_amount=total_amount + (parseFloat(cartByChatId[i].cost)).toFixed(2) *cartByChatId[i].count
                 }
 
             fetch(config.pre_url+`/product/img?id=${dataObj[2]}`).then(response => response.json())
                 .then(data=>{ 
-                bot.editMessageText('Корзина:\n '+cartByChatId[indexOf].cost+' UZS '+' x '+cartByChatId[indexOf].count+' = '+calculated_cost+' UZS \n\n'+'<a href="'+config.pre_url_picture+data.img+'">'+data.description+'</a>',{
+                bot.editMessageText('Корзина:\n '+cartByChatId[indexOf].cost+' UZS '+' x '+cartByChatId[indexOf].count+' = '+calculated_cost.toFixed(2)+' UZS \n\n'+'<a href="'+config.pre_url_picture+data.img+'">'+data.description+'</a>',{
                     chat_id: query.message.chat.id,
                     message_id:query.message.message_id,
                     reply_markup:{
                         inline_keyboard:[
                             [{text:'❌',callback_data:'❌'},{text:'🔻',callback_data:'🔻'},{text:cartByChatId[indexOf].count+' шт.',callback_data:'c'},{text:'🔺',callback_data:'🔺'}],
                             [{text:'◀️',callback_data:'◀️'},{text: (indexOf+1)+'/'+cartByChatId.length,callback_data:'nu'},{text:'▶️',callback_data:'▶️'}],
-                            [{text:'✅ Заказ на '+total_amount+' UZS Оформить?',callback_data:'formalize'}]
+                            [{text:'✅ Заказ на '+total_amount.toFixed(2)+' UZS Оформить?',callback_data:'formalize'}]
                         ]
                     },
                     parse_mode:'HTML'
@@ -809,14 +816,14 @@ console.log('dataObj[2] '+dataObj[2]) //id of pruduct
 console.log('Qara buyoga>>>>>>>'+calculated_cost)
         fetch(config.pre_url+`/product/img?id=${dataObj[2]}`).then(response => response.json())
             .then(data=>{ 
-            bot.editMessageText('Корзина:\n '+cartByChatId[indexOf].cost+' UZS '+' x '+cartByChatId[indexOf].count+' = '+calculated_cost+' UZS \n\n'+'<a href="'+config.pre_url_picture+data.img+'">'+data.description+'</a>',{
+            bot.editMessageText('Корзина:\n '+cartByChatId[indexOf].cost+' UZS '+' x '+cartByChatId[indexOf].count+' = '+calculated_cost.toFixed(2)+' UZS \n\n'+'<a href="'+config.pre_url_picture+data.img+'">'+data.description+'</a>',{
                 chat_id: query.message.chat.id,
                 message_id:query.message.message_id,
                 reply_markup:{
                     inline_keyboard:[
                         [{text:'❌',callback_data:'❌'},{text:'🔻',callback_data:'🔻'},{text:cartByChatId[indexOf].count+' шт.',callback_data:'c'},{text:'🔺',callback_data:'🔺'}],
                         [{text:'◀️',callback_data:'◀️'},{text: (indexOf+1)+'/'+cartByChatId.length,callback_data:'nu'},{text:'▶️',callback_data:'▶️'}],
-                        [{text:'✅ Заказ на '+total_amount+' UZS Оформить?',callback_data:'formalize'}]
+                        [{text:'✅ Заказ на '+total_amount.toFixed(2)+' UZS Оформить?',callback_data:'formalize'}]
                     ]
                 },
                 parse_mode:'HTML'
